@@ -702,6 +702,7 @@ pointer-events:none;z-index:0}
           <div class="plan-tag">plan</div>
           <div class="plan-name">Free Plan</div>
           <button class="plan-btn">Upgrade Pro ↗</button>
+        <button onclick="logout()" style="width:100%;background:transparent;border:1px solid var(--b1);color:var(--t3);border-radius:6px;padding:7px;font-size:12px;cursor:pointer;margin-top:7px;">Sign out</button>
         </div>
       </div>
     </div>
@@ -953,7 +954,33 @@ function populateBranches(g){var sel=el('pf-branch');if(!sel)return;var opts=BRA
 (function(){var ni=el('pf-name'),bi=el('pf-branch'),yi=el('pf-year'),nb=el('pf-next-btn');if(!ni)return;function chk(){var n=ni.value.trim(),b=bi.value,y=yi.value;nb.disabled=!(n.length>=2&&b&&y);if(n.length>=2){S.name=n;S.branch=b;S.year=y;el('prev-av').textContent=n.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'?';el('prev-name').textContent=n;el('prev-meta').textContent=(b?b:'')+(S.college?' · '+S.college.short:'');el('prev-box').style.display='flex';}else{el('prev-box').style.display='none';}}ni.addEventListener('input',chk);bi.addEventListener('change',chk);yi.addEventListener('change',chk);})();
 
 /* ── LAUNCH ── */
-function launchApp(){var ni=el('pf-name'),bi=el('pf-branch'),yi=el('pf-year');if(ni)S.name=ni.value.trim();if(bi)S.branch=bi.value;if(yi)S.year=yi.value;G('pg-app');initApp();confetti();}
+function launchApp(){
+  var ni=el('pf-name'),bi=el('pf-branch'),yi=el('pf-year');
+  if(ni)S.name=ni.value.trim();if(bi)S.branch=bi.value;if(yi)S.year=yi.value;
+  saveSession();
+  G('pg-app');initApp();confetti();
+}
+function saveSession(){
+  try{localStorage.setItem('ameyay_session',JSON.stringify({
+    name:S.name,goal:S.goal,branch:S.branch,year:S.year,
+    timeMode:S.timeMode,timeLabel:S.timeLabel,
+    college:S.college,studentId:S.studentId,
+    xp:S.xp
+  }));}catch(e){}
+}
+function loadSession(){
+  try{
+    var raw=localStorage.getItem('ameyay_session');
+    if(!raw)return false;
+    var d=JSON.parse(raw);
+    if(!d||!d.name)return false;
+    S.name=d.name;S.goal=d.goal||'college';S.branch=d.branch||'';
+    S.year=d.year||'';S.timeMode=d.timeMode||'month';
+    S.timeLabel=d.timeLabel||'';S.college=d.college||null;
+    S.studentId=d.studentId||'';S.xp=d.xp||0;
+    return true;
+  }catch(e){return false;}
+}
 window.launchApp=launchApp;
 
 /* ── CONFETTI ── */
@@ -1017,9 +1044,22 @@ function setMode(el_,m){document.querySelectorAll('.mp').forEach(function(p){p.c
 window.setMode=setMode;
 
 /* ── API ── */
-var API='https://ameyay.onrender.com/api/tutor/chat',GEN='https://ameyay.onrender.com/api/tutor/generate',QUIZ='https://ameyay.onrender.com/api/quiz/generate';
+var API='/api/tutor/chat',GEN='/api/tutor/generate',QUIZ='/api/quiz/generate';
 function sysPmt(){var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={college:(S.college?S.college.name:'')+' '+(S.branch||''),gate:'GATE 2027 Paper '+(S.branch||'IN'),jee:'JEE / JEE Advanced',neet:'NEET',boards:'Class 11/12',upsc:'UPSC Civil Services'}[g]||'exam';return 'You are Ameyay, a personal AI tutor for '+(S.name||'a student')+' preparing for '+exam+'.\n\nTime Mode: '+m.label+' ('+m.short+' to exam) — urgency: '+m.urgency+'\nExplanation mode: '+S.tutorMode+'\n\nBased on urgency "'+m.urgency+'", adjust response style: '+{extreme:'Ultra-concise. Only what\'s needed for tonight. No fluff.',high:'Fast-paced. Focus on high-yield content only.',medium:'Balanced. Cover topics properly but stay focused.',moderate:'Thorough but engaging. Build real understanding.',low:'Deep and strategic. Master concepts, not just surface.',relaxed:'Comprehensive. Build from fundamentals to advanced.'}[m.urgency]+'\n\nUse **bold** for key terms, `code` for formulas. Be encouraging and exam-focused.';}
-async function callAPI(messages){var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:MDL,max_tokens:1200,system:sysPmt(),messages:messages})});if(!r.ok){var e={};try{e=await r.json();}catch(_){}throw new Error((e.error&&e.error.message)||'API error '+r.status);}var d=await r.json();return d.content[0].text;}
+async function callAPI(messages){
+  var r=await fetch('/api/tutor/chat',{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      message:messages[messages.length-1].content,
+      history:messages.slice(0,-1),
+      tutorMode:S.tutorMode,
+      goal:S.goal,name:S.name,
+      college:S.college?S.college.name:'',
+      branch:S.branch,timeMode:S.timeMode
+    })});
+  if(!r.ok){var e={};try{e=await r.json();}catch(_){}throw new Error((e.error&&e.error.message)||'AI error '+r.status);}
+  var d=await r.json();return d.reply;
+}
 
 /* ── CHAT ── */
 function addMsg(role,content,isTyping){var ca=el('chat-msgs');if(!ca)return null;var div=document.createElement('div');div.className='chat-msg'+(role==='user'?' u':'');if(isTyping)div.id='typing-ind';var initials=(S.name||'').split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'ME';var av=role==='user'?'<div class="c-av c-u">'+initials+'</div>':'<div class="c-av c-ai"><i class="ti ti-robot" style="font-size:11px;"></i></div>';var bub=isTyping?'<div class="c-bub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>':'<div class="c-bub">'+fmt(content)+'</div>';div.innerHTML=role==='user'?bub+av:av+bub;ca.appendChild(div);ca.scrollTop=ca.scrollHeight;return div;}
@@ -1048,7 +1088,7 @@ rg.innerHTML=items.map(function(r){return '<div class="rc" onclick="qAsk(\''+r.q
 
 /* ── QUIZ ── */
 function buildQuizTopics(){var g=S.goal||'college',data=SUBJECTS[g]||SUBJECTS['college'];var sel=el('q-topic');if(!sel)return;var opts=['Mixed Topics — Full Syllabus'].concat(data.chapters.map(function(c){return c.name;}));sel.innerHTML=opts.map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('');}
-async function startQuiz(){var topic=el('q-topic').value,count=parseInt(el('q-count').value)||10,diff=el('q-diff').value;var g=S.goal||'college';var exam={gate:'GATE IN 2027',jee:'JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var btn=el('quiz-start-btn'),gm=el('quiz-gen-msg');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin" style="font-size:16px;"></i> Generating…';gm.style.display='block';try{var p='Generate exactly '+count+' MCQs for '+exam+' on: "'+topic+'". Difficulty: '+diff+'.\nReturn ONLY valid JSON array, no markdown:\n[{"q":"question","opts":["A) opt","B) opt","C) opt","D) opt"],"ans":0,"exp":"explanation"}]\nans is 0-based. Exam-level questions. Include formulas in explanations.';var raw=await callAPI([{role:'user',content:p}]);var qs;try{qs=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){var m=raw.match(/\[[\s\S]*\]/);if(!m)throw new Error('Could not parse questions.');qs=JSON.parse(m[0]);}if(!Array.isArray(qs)||!qs.length)throw new Error('No questions generated.');S.quiz={questions:qs,current:0,score:0,answers:[],timer:null,timeLeft:120};el('quiz-setup').style.display='none';el('quiz-run').style.display='block';renderQ();startQT();}catch(e){toast('Error: '+e.message,'alert-circle');btn.disabled=false;btn.innerHTML='<i class="ti ti-player-play" style="font-size:16px;"></i> Generate &amp; Start Quiz';gm.style.display='none';}}
+async function startQuiz(){var topic=el('q-topic').value,count=parseInt(el('q-count').value)||10,diff=el('q-diff').value;var g=S.goal||'college';var exam={gate:'GATE IN 2027',jee:'JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var btn=el('quiz-start-btn'),gm=el('quiz-gen-msg');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin" style="font-size:16px;"></i> Generating…';gm.style.display='block';try{var qr=await fetch('/api/quiz/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic:topic,count:count,difficulty:diff,goal:S.goal,branch:S.branch})});if(!qr.ok){var qe=await qr.json().catch(function(){return{};});throw new Error((qe.error)||'Quiz generation failed');}var qdata=await qr.json();var raw=JSON.stringify(qdata.questions);var qs;try{qs=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){var m=raw.match(/\[[\s\S]*\]/);if(!m)throw new Error('Could not parse questions.');qs=JSON.parse(m[0]);}if(!Array.isArray(qs)||!qs.length)throw new Error('No questions generated.');S.quiz={questions:qs,current:0,score:0,answers:[],timer:null,timeLeft:120};el('quiz-setup').style.display='none';el('quiz-run').style.display='block';renderQ();startQT();}catch(e){toast('Error: '+e.message,'alert-circle');btn.disabled=false;btn.innerHTML='<i class="ti ti-player-play" style="font-size:16px;"></i> Generate &amp; Start Quiz';gm.style.display='none';}}
 window.startQuiz=startQuiz;
 function renderQ(){var q=S.quiz.questions[S.quiz.current],total=S.quiz.questions.length;el('qn').textContent=S.quiz.current+1;el('qt').textContent=total;el('live-score').textContent=S.quiz.score.toFixed(2);el('q-text').textContent=q.q;var pb=el('q-prog-bar');pb.innerHTML=S.quiz.questions.map(function(_,i){return '<div style="flex:1;height:3px;border-radius:2px;background:'+(i<S.quiz.current?'var(--green)':i===S.quiz.current?'var(--ac)':'var(--s4)')+'"></div>';}).join('');var qo=el('q-opts');qo.innerHTML=q.opts.map(function(o,i){return '<div class="q-opt" onclick="selAns('+i+')" tabindex="0" role="radio"><div class="q-ol">'+String.fromCharCode(65+i)+'</div><span>'+o+'</span></div>';}).join('');var qe=el('q-exp');qe.classList.remove('show');qe.innerHTML='';el('next-q-btn').disabled=true;S.quiz.timeLeft=120;updQT();}
 function startQT(){if(S.quiz.timer)clearInterval(S.quiz.timer);S.quiz.timer=setInterval(function(){S.quiz.timeLeft--;updQT();if(S.quiz.timeLeft<=0){clearInterval(S.quiz.timer);skipQ();}},1000);}
@@ -1065,7 +1105,7 @@ function updQuizStat(){if(!S.quizStats.scores.length)return;var avg=S.quizStats.
 
 /* ── CHEAT SHEETS ── */
 function buildCSFilters(){var g=S.goal||'college';var topics={college:['Data Structures','Operating Systems','Computer Networks','Engineering Mathematics'],gate:['Control Systems','Instrumentation','Signals & Systems','Analog Electronics'],jee:['Mechanics','Electrostatics','Organic Chemistry','Calculus'],neet:['Cell Biology','Human Physiology','Chemical Bonding','Laws of Motion'],boards:['Electric Fields','Current Electricity','Organic Chemistry','Calculus'],upsc:['Indian Polity','Indian Economy','Modern History','Geography']}[g]||['Core Topics'];var fb=el('cs-filter-bar');if(!fb)return;fb.innerHTML=topics.map(function(t,i){return '<div class="syl-fc'+(i===0?' active':'')+'" onclick="loadCS(this,\''+t.replace(/'/g,"\\'")+'\')">'+t.toLowerCase()+'</div>';}).join('');loadCS(fb.querySelector('.syl-fc.active'),topics[0]);}
-async function loadCS(el_,topic){document.querySelectorAll('#cs-filter-bar .syl-fc').forEach(function(f){f.classList.remove('active');});if(el_)el_.classList.add('active');S.csCurrentTopic=topic;var cc=el('cs-content');if(!cc)return;cc.innerHTML='<div style="text-align:center;padding:44px;color:var(--t3);"><i class="ti ti-loader-2 spin" style="font-size:28px;display:block;margin-bottom:12px;"></i>Generating…</div>';try{var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={gate:'GATE IN 2027',jee:'JEE/JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var p='Create a '+(m.urgency==='extreme'?'ultra-concise crash':'concise')+' cheat sheet for '+exam+' on: "'+topic+'".\n\nFormat:\n## '+topic+' — '+(m.urgency==='extreme'?'Tonight\'s':'Quick')+' Reference\n### Key Formulas\n'+(m.urgency==='extreme'?'Top 5 only':'5-8 most important')+'\n### Key Concepts\n3-4 bullet points\n### Exam Tips\n2-3 specific tips\n\nBe concise. Adapted for '+m.label+'.';var reply=await callAPI([{role:'user',content:p}]);cc.innerHTML='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:20px;margin-bottom:12px;font-size:13px;line-height:1.8;">'+fmt(reply)+'</div><div style="display:flex;gap:8px;"><button onclick="loadCS(document.querySelector(\'#cs-filter-bar .syl-fc.active\'),\''+topic.replace(/'/g,"\\'")+'\');" class="btn-send" style="font-size:12px;padding:8px 14px;"><i class="ti ti-refresh" style="font-size:12px;"></i> Regenerate</button><button onclick="exportCS()" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;color:var(--t2);display:inline-flex;align-items:center;gap:5px;"><i class="ti ti-download" style="font-size:12px;"></i> Export</button></div>';}catch(e){cc.innerHTML='<div style="text-align:center;padding:32px;color:var(--red);">Error: '+e.message+'</div>';}}
+async function loadCS(el_,topic){document.querySelectorAll('#cs-filter-bar .syl-fc').forEach(function(f){f.classList.remove('active');});if(el_)el_.classList.add('active');S.csCurrentTopic=topic;var cc=el('cs-content');if(!cc)return;cc.innerHTML='<div style="text-align:center;padding:44px;color:var(--t3);"><i class="ti ti-loader-2 spin" style="font-size:28px;display:block;margin-bottom:12px;"></i>Generating…</div>';try{var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={gate:'GATE IN 2027',jee:'JEE/JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var p='Create a '+(m.urgency==='extreme'?'ultra-concise crash':'concise')+' cheat sheet for '+exam+' on: "'+topic+'".\n\nFormat:\n## '+topic+' — '+(m.urgency==='extreme'?'Tonight\'s':'Quick')+' Reference\n### Key Formulas\n'+(m.urgency==='extreme'?'Top 5 only':'5-8 most important')+'\n### Key Concepts\n3-4 bullet points\n### Exam Tips\n2-3 specific tips\n\nBe concise. Adapted for '+m.label+'.';var csr=await fetch('/api/tutor/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'cheatsheet',topic:topic,goal:S.goal,branch:S.branch,timeMode:S.timeMode,name:S.name})});if(!csr.ok)throw new Error('Cheat sheet failed');var csd=await csr.json();var reply=csd.content;cc.innerHTML='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:20px;margin-bottom:12px;font-size:13px;line-height:1.8;">'+fmt(reply)+'</div><div style="display:flex;gap:8px;"><button onclick="loadCS(document.querySelector(\'#cs-filter-bar .syl-fc.active\'),\''+topic.replace(/'/g,"\\'")+'\');" class="btn-send" style="font-size:12px;padding:8px 14px;"><i class="ti ti-refresh" style="font-size:12px;"></i> Regenerate</button><button onclick="exportCS()" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;color:var(--t2);display:inline-flex;align-items:center;gap:5px;"><i class="ti ti-download" style="font-size:12px;"></i> Export</button></div>';}catch(e){cc.innerHTML='<div style="text-align:center;padding:32px;color:var(--red);">Error: '+e.message+'</div>';}}
 window.loadCS=loadCS;
 async function customCS(){var topic=prompt('Enter topic for custom cheat sheet:');if(!topic||!topic.trim())return;await loadCS(null,topic.trim());}
 window.customCS=customCS;
@@ -1077,6 +1117,12 @@ function buildProgBars(){var g=S.goal||'college';var items={college:[['Data Stru
 
 /* ── INIT ── */
 renderCols('');
+// ── AUTO-LOGIN: if session saved, skip straight to app ──
+if(loadSession()){
+  console.log('Session restored for',S.name);
+  G('pg-app');
+  setTimeout(initApp,100);
+}
 var csi=el('col-search');if(csi){csi.addEventListener('input',function(){renderCols(csi.value);});csi.addEventListener('focus',function(){if(!csi.value)renderCols('');});}
 
 })();
