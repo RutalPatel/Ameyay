@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const OLLAMA_BASE = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_BASE = process.env.OLLAMA_URL || 'http://localhost:3000';
 const DEFAULT_MODEL = process.env.OLLAMA_MODEL || 'llama3.2';
 
 // Check if Ollama is running and return available models
