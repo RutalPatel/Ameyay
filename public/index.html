@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ameyay — AI Tutor for Every Campus</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#07070f;--s1:#0f0f1a;--s2:#161625;--s3:#1e1e30;--s4:#28283c;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);--b3:rgba(255,255,255,0.2);
+  --t1:#f0edff;--t2:#7b7899;--t3:#3e3c55;
+  --ac:#c8ff57;--acd:rgba(200,255,87,0.07);--acm:rgba(200,255,87,0.15);
+  --green:#3dffa0;--gd:rgba(61,255,160,0.08);
+  --red:#ff5e6e;--rd:rgba(255,94,110,0.09);
+  --amber:#ffc14d;--ad:rgba(255,193,77,0.09);
+  --blue:#5b9cf6;--bd:rgba(91,156,246,0.09);
+  --rose:#ff6eb4;
+  --purple:#b794f4;--pud:rgba(183,148,244,0.09);
+  --r:8px;--rm:13px;--rl:20px;--rxl:28px;
+  --mode-color:#c8ff57;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Cabinet Grotesk',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;overflow:hidden}
+button,input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+/* Mesh background */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 50% at 20% 20%,rgba(200,255,87,0.035) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 60% at 80% 80%,rgba(91,156,246,0.04) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 40% at 60% 10%,rgba(183,148,244,0.03) 0%,transparent 50%);
+pointer-events:none;z-index:0}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none;width:100%;height:100vh;flex-direction:column;overflow:hidden;position:relative;z-index:1}
+.page.active{display:flex}
+.scroll-y{overflow-y:auto}
+
+/* ════════════════════════════════════
+   HERO PAGE
+════════════════════════════════════ */
+#pg-hero{overflow-y:auto}
+.hero-nav{display:flex;align-items:center;padding:18px 52px;position:sticky;top:0;z-index:20;background:rgba(7,7,15,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1)}
+.logo{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--t1)}
+.logo em{color:var(--ac);font-style:normal}
+.nav-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2);border-radius:var(--r);padding:9px 20px;font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
+.btn-ghost:hover{border-color:var(--b3);color:var(--t1)}
+.btn-pill{background:var(--ac);color:#000;border:none;border-radius:40px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Clash Display',sans-serif;transition:all .15s}
+.btn-pill:hover{opacity:.88;transform:translateY(-1px)}
+
+.hero-wrap{max-width:1180px;margin:0 auto;width:100%;padding:0 52px}
+.hero-body{display:grid;grid-template-columns:1.1fr 0.9fr;gap:52px;align-items:center;padding:72px 0 52px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--acd);border:1px solid rgba(200,255,87,0.18);color:var(--ac);font-size:12px;padding:6px 14px;border-radius:40px;margin-bottom:24px;font-family:'JetBrains Mono',monospace}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.hero-h1{font-family:'Clash Display',sans-serif;font-size:56px;font-weight:700;line-height:1.04;letter-spacing:-2px;margin-bottom:20px;color:var(--t1)}
+.hero-h1 .line-ac{color:var(--ac);display:block}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.7;margin-bottom:32px;max-width:460px;font-weight:400}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:44px}
+.cta-primary{background:var(--ac);color:#000;border:none;border-radius:var(--rxl);padding:16px 30px;font-size:16px;font-weight:700;font-family:'Clash Display',sans-serif;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.cta-primary::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .15s}
+.cta-primary:hover::after{background:rgba(255,255,255,.12)}
+.cta-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,255,87,.25)}
+.cta-sec{background:var(--s2);border:1px solid var(--b2);color:var(--t1);border-radius:var(--rxl);padding:16px 30px;font-size:16px;font-weight:500;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .15s}
+.cta-sec:hover{border-color:var(--b3);transform:translateY(-1px)}
+.hero-stats{display:flex;gap:32px}
+.hs{display:flex;flex-direction:column}
+.hs-n{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:500;color:var(--t1)}
+.hs-l{font-size:11px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.8px}
+
+/* Chat preview widget */
+.chat-widget{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px var(--b1),inset 0 1px 0 rgba(255,255,255,.05)}
+.cw-bar{background:var(--s2);border-bottom:1px solid var(--b1);padding:14px 18px;display:flex;align-items:center;gap:7px}
+.cw-dots{display:flex;gap:5px}
+.cw-dot{width:10px;height:10px;border-radius:50%}
+.cw-badge{margin-left:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3)}
+.cw-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ac);font-family:'JetBrains Mono',monospace}
+.cw-msgs{padding:20px;display:flex;flex-direction:column;gap:12px;min-height:280px}
+.cw-msg{display:flex;gap:9px;max-width:90%}
+.cw-msg.u{align-self:flex-end;flex-direction:row-reverse}
+.cw-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.ai-av{background:var(--s3);color:var(--ac);border:1px solid var(--b2)}
+.u-av{background:var(--ac);color:#000}
+.cw-bub{background:var(--s3);border:1px solid var(--b1);border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.65;color:var(--t1)}
+.cw-msg.u .cw-bub{background:var(--s2)}
+.cw-formula{background:#000;border:1px solid rgba(200,255,87,.2);border-radius:6px;padding:9px 12px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)}
+.cw-mode-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(200,255,87,.1);color:var(--ac);font-size:10px;padding:3px 8px;border-radius:20px;margin-top:6px;font-family:'JetBrains Mono',monospace}
+.cw-inp{border-top:1px solid var(--b1);padding:14px 18px;display:flex;gap:8px;align-items:center}
+.cw-field{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:9px 13px;font-size:12px;color:var(--t3)}
+.cw-send{background:var(--ac);border:none;border-radius:7px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#000;cursor:default;flex-shrink:0}
+
+/* Feature belt */
+.feat-belt{padding:0 0 72px}
+.feat-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px}
+.feat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.fc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:22px;transition:all .2s;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.fc:hover::before{background:var(--fc-color,var(--ac))}
+.fc:hover{border-color:var(--b2);transform:translateY(-2px)}
+.fc.star{border-color:rgba(200,255,87,.22);background:linear-gradient(135deg,rgba(200,255,87,.05) 0%,var(--s1) 100%)}
+.fc.star::before{background:var(--ac)}
+.fc-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px}
+.fc-name{font-family:'Clash Display',sans-serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--t1)}
+.fc.star .fc-name{color:var(--ac)}
+.fc-desc{font-size:12px;color:var(--t3);line-height:1.65}
+
+/* ════════════════════════════════════
+   ONBOARDING SHARED
+════════════════════════════════════ */
+.ob{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:44px 24px 80px;overflow-y:auto}
+.ob-logo{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;color:var(--t1);margin-bottom:48px}
+.ob-logo em{color:var(--ac);font-style:normal}
+.ob-card{width:100%;max-width:580px}
+.ob-prog{display:flex;gap:5px;margin-bottom:30px}
+.prg{flex:1;height:3px;border-radius:2px;background:var(--s4);transition:background .4s}
+.prg.done{background:var(--ac)}
+.prg.now{background:rgba(200,255,87,.45)}
+.ob-step{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:.8px;margin-bottom:8px}
+.ob-h{font-family:'Clash Display',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.6px;margin-bottom:6px;color:var(--t1)}
+.ob-s{font-size:14px;color:var(--t2);margin-bottom:26px}
+.ob-btns{display:flex;gap:10px;margin-top:24px}
+.ob-back{background:var(--s2);border:1px solid var(--b1);color:var(--t2);border-radius:var(--r);padding:13px 18px;font-size:13px;cursor:pointer;transition:all .12s;flex-shrink:0}
+.ob-back:hover{color:var(--t1);border-color:var(--b2)}
+.ob-next{flex:1;background:var(--ac);color:#000;border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:700;font-family:'Clash Display',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.ob-next:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.ob-next:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.ob-skip{flex:.5;background:var(--s3);border:1px solid var(--b1);color:var(--t2);border-radius:var(--r);padding:13px;font-size:13px;cursor:pointer;transition:all .12s}
+.ob-skip:hover{color:var(--t1)}
+
+/* Goal cards */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gc{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--rl);padding:18px 16px;cursor:pointer;display:flex;gap:13px;align-items:flex-start;transition:all .15s}
+.gc:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-1px)}
+.gc.sel{border-color:var(--ac);background:var(--acd);box-shadow:0 0 0 1px rgba(200,255,87,.12)}
+.gc-em{font-size:24px;flex-shrink:0;margin-top:1px}
+.gc-name{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;margin-bottom:3px;color:var(--t1)}
+.gc.sel .gc-name{color:var(--ac)}
+.gc-desc{font-size:11px;color:var(--t3);line-height:1.5}
+
+/* College search */
+.cs-wrap{position:relative;margin-bottom:13px}
+.cs-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:17px;pointer-events:none}
+.cs-inp{width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:var(--rm);padding:13px 16px 13px 44px;font-size:13px;color:var(--t1);outline:none;transition:border .15s;font-family:'Cabinet Grotesk',sans-serif}
+.cs-inp:focus{border-color:var(--ac)}
+.cs-inp::placeholder{color:var(--t3)}
+.col-list{max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.col-lbl{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.5px;padding:8px 2px 5px;text-transform:uppercase}
+.col-item{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r);padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:11px;transition:all .12s}
+.col-item:hover{border-color:var(--b2);background:var(--s2)}
+.col-item.sel{border-color:var(--ac);background:var(--acd)}
+.col-type{background:var(--s3);color:var(--t2);font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 7px;border-radius:4px;flex-shrink:0}
+.col-item.sel .col-type{background:var(--acm);color:var(--ac)}
+.col-name{font-size:13px;font-weight:500;flex:1}
+.col-city{font-size:11px;color:var(--t3);margin-top:1px}
+.col-chk{font-size:16px;color:var(--ac);display:none}
+.col-item.sel .col-chk{display:block}
+.no-col{text-align:center;padding:30px;color:var(--t3)}
+.no-col-btn{background:none;border:1px solid var(--b2);color:var(--ac);padding:8px 15px;border-radius:6px;margin-top:10px;font-size:12px;cursor:pointer;font-family:'JetBrains Mono',monospace}
+
+/* ID page */
+.ob-lbl{font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:7px}
+.ob-inp{width:100%;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--rm);padding:14px 16px;font-size:16px;color:var(--t1);outline:none;transition:border .15s;font-family:'JetBrains Mono',monospace;letter-spacing:1.5px}
+.ob-inp:focus{border-color:var(--ac)}
+.ob-inp::placeholder{color:var(--t3);letter-spacing:0;font-family:'Cabinet Grotesk',sans-serif;font-size:14px}
+.id-ok{display:none;align-items:center;gap:6px;color:var(--green);font-size:12px;margin-top:9px;font-family:'JetBrains Mono',monospace}
+.id-ok.show{display:flex}
+.ob-info{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:13px 14px;display:flex;gap:9px;margin-top:13px}
+.ob-info p{font-size:12px;color:var(--t3);line-height:1.65}
+
+/* Profile */
+.ob-field{margin-bottom:16px}
+.ob-field label{display:block;font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.ob-field input,.ob-field select{width:100%;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r);padding:12px 14px;font-size:14px;color:var(--t1);outline:none;transition:border .15s;-webkit-appearance:none;font-family:'Cabinet Grotesk',sans-serif}
+.ob-field input:focus,.ob-field select:focus{border-color:var(--ac)}
+.ob-field input::placeholder{color:var(--t3)}
+.ob-field select option{background:var(--s2)}
+.prev-box{background:var(--acd);border:1px solid rgba(200,255,87,.15);border-radius:var(--r);padding:14px 16px;display:none;align-items:center;gap:12px;margin-top:8px}
+.prev-box.show{display:flex}
+.prev-av{width:38px;height:38px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+
+/* ════════════════════════════════════
+   TIME SELECTION PAGE — HERO FEATURE
+════════════════════════════════════ */
+#pg-time{background:var(--bg)}
+.time-page-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:44px 24px 80px;overflow-y:auto}
+.time-prog{display:flex;gap:5px;margin-bottom:30px;width:100%;max-width:580px}
+.time-h{font-family:'Clash Display',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.8px;margin-bottom:6px;color:var(--t1);text-align:center}
+.time-sub{font-size:14px;color:var(--t2);margin-bottom:36px;text-align:center;max-width:420px}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:680px;margin-bottom:32px}
+.tc{border-radius:var(--rxl);padding:22px 18px;cursor:pointer;transition:all .2s;border:1.5px solid var(--b1);background:var(--s1);display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden}
+.tc::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.tc:hover::before{opacity:1}
+.tc:hover{transform:translateY(-3px);border-color:var(--tc-col)}
+.tc.sel{transform:translateY(-3px);border-color:var(--tc-col);box-shadow:0 0 0 1px var(--tc-col),0 16px 40px rgba(0,0,0,.4)}
+.tc.sel::after{content:'✓';position:absolute;top:12px;right:14px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--tc-col)}
+.tc-emoji{font-size:34px;margin-bottom:12px;display:block;line-height:1}
+.tc-time{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.tc.sel .tc-time{color:var(--tc-col)}
+.tc-mode{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tc-col);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase}
+.tc-desc{font-size:11px;color:var(--t3);line-height:1.55}
+.tc-badge{display:inline-block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:20px;font-size:10px;color:var(--t2);padding:3px 9px;margin-top:8px;font-family:'JetBrains Mono',monospace}
+.tc.sel .tc-badge{background:rgba(255,255,255,.1);border-color:var(--tc-col);color:var(--tc-col)}
+
+/* urgency preview */
+.urgency-preview{width:100%;max-width:580px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;margin-bottom:8px;display:none}
+.urgency-preview.show{display:block;animation:fi .25s ease}
+.up-head{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
+.up-tasks{display:flex;flex-direction:column;gap:7px}
+.up-task{background:var(--s2);border-radius:var(--r);padding:9px 13px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px;border-left:2px solid}
+.up-task i{font-size:14px;flex-shrink:0}
+
+/* ════════════════════════════════════
+   MAIN APP
+════════════════════════════════════ */
+#pg-app{overflow:hidden}
+.app-layout{display:grid;grid-template-columns:220px 1fr;grid-template-rows:54px 1fr;height:100vh;overflow:hidden}
+
+/* Topbar */
+.app-top{grid-column:1/-1;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:10}
+.app-logo{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.5px;color:var(--t1)}
+.app-logo em{color:var(--ac);font-style:normal}
+.app-search{flex:1;max-width:340px;margin-left:14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 13px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t3);transition:border .15s}
+.app-search:focus-within{border-color:var(--b2)}
+.app-search input{background:none;border:none;outline:none;color:var(--t1);font-size:12px;width:100%}
+.app-search input::placeholder{color:var(--t3)}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.streak-chip{background:var(--ad);color:var(--amber);font-size:11px;padding:4px 11px;border-radius:20px;font-family:'JetBrains Mono',monospace;cursor:pointer}
+.mode-chip{border-radius:20px;font-size:11px;padding:4px 11px;font-family:'JetBrains Mono',monospace;cursor:pointer;border:1px solid;transition:all .15s;font-weight:500}
+.top-bell{position:relative;cursor:pointer}
+.bell-dot{position:absolute;top:0;right:0;width:6px;height:6px;background:var(--ac);border-radius:50%;border:1.5px solid var(--s1)}
+.user-av{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;font-family:'JetBrains Mono',monospace;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.user-av:hover{transform:scale(1.08)}
+
+/* Sidebar */
+.app-sb{background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.sb-user{padding:14px 15px;border-bottom:1px solid var(--b1)}
+.sb-u-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);margin-bottom:3px;letter-spacing:.5px}
+.sb-u-name{font-size:15px;font-weight:700;font-family:'Clash Display',sans-serif;color:var(--t1)}
+.sb-u-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.sb-u-badge{display:inline-flex;align-items:center;gap:5px;background:var(--s3);border:1px solid var(--b1);color:var(--t2);font-size:11px;padding:3px 9px;border-radius:20px;margin-top:7px;font-family:'JetBrains Mono',monospace;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Mode banner in sidebar */
+.sb-mode-banner{margin:12px 10px;border-radius:var(--rm);padding:12px 13px;position:relative;overflow:hidden;cursor:pointer}
+.sb-mode-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(255,255,255,.06);border-radius:50%}
+.sb-mode-time{font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:2px}
+.sb-mode-lbl{font-size:11px;opacity:.7;font-family:'JetBrains Mono',monospace}
+.sb-mode-progress{margin-top:8px;height:3px;background:rgba(0,0,0,.3);border-radius:2px;overflow:hidden}
+.sb-mode-fill{height:100%;border-radius:2px;background:rgba(255,255,255,.6);width:0%;transition:width .6s ease}
+
+.sb-sec{padding:9px 0 2px}
+.sb-sec-lbl{font-size:10px;color:var(--t3);padding:0 13px 5px;font-family:'JetBrains Mono',monospace;letter-spacing:.8px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 11px;margin:1px 7px;border-radius:var(--r);font-size:13px;color:var(--t2);cursor:pointer;transition:all .12s;position:relative}
+.sb-item:hover{background:var(--s2);color:var(--t1)}
+.sb-item.active{color:var(--ac);background:var(--acd);border:1px solid rgba(200,255,87,.1)}
+.sb-item i{font-size:16px}
+.sb-badge{margin-left:auto;font-size:10px;background:var(--gd);color:var(--green);padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.sb-foot{margin-top:auto;padding:13px;border-top:1px solid var(--b1)}
+.plan-box{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--b2);border-radius:var(--rm);padding:13px}
+.plan-tag{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.plan-name{font-size:14px;font-weight:700;font-family:'Clash Display',sans-serif;margin-bottom:9px}
+.plan-btn{width:100%;background:var(--ac);color:#000;border:none;border-radius:7px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Clash Display',sans-serif;transition:opacity .12s}
+.plan-btn:hover{opacity:.88}
+
+/* Main panels */
+.app-main{overflow-y:auto;background:var(--bg)}
+.panel{display:none;padding:24px 26px;animation:fi .22s ease}
+.panel.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.pg-h{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:3px}
+.pg-s{font-size:12px;color:var(--t3);margin-bottom:20px}
+
+/* ── AI TUTOR HIGHLIGHT ── */
+.tutor-banner{border-radius:var(--rxl);padding:24px;margin-bottom:20px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 40%,rgba(200,255,87,.04) 100%);border:1px solid rgba(200,255,87,.2)}
+.tutor-banner::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(200,255,87,.07) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.tb-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tb-title{font-family:'Clash Display',sans-serif;font-size:23px;font-weight:700;letter-spacing:-.5px;margin-bottom:5px}
+.tb-sub{font-size:13px;color:var(--t2);margin-bottom:18px}
+.mode-pills{display:flex;gap:7px;flex-wrap:wrap}
+.mp{background:rgba(255,255,255,.06);border:1px solid var(--b1);color:var(--t2);font-size:11px;padding:6px 13px;border-radius:20px;cursor:pointer;transition:all .12s;font-family:'JetBrains Mono',monospace}
+.mp:hover{border-color:var(--b3);color:var(--t1)}
+.mp.active{background:var(--acd);border-color:rgba(200,255,87,.3);color:var(--ac)}
+
+/* Chat */
+.chat-box{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);overflow:hidden;margin-bottom:14px}
+.chat-msgs{height:340px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:13px}
+.chat-msg{display:flex;gap:9px}
+.chat-msg.u{flex-direction:row-reverse;align-self:flex-end;max-width:84%}
+.c-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.c-ai{background:var(--s3);color:var(--ac);border:1px solid var(--b2)}
+.c-u{background:var(--ac);color:#000}
+.c-bub{background:var(--s2);border:1px solid var(--b1);border-radius:11px;padding:11px 14px;font-size:13px;line-height:1.7;color:var(--t1);max-width:82%}
+.chat-msg.u .c-bub{background:var(--s3);max-width:100%}
+.c-bub strong{font-weight:700}
+.c-bub em{color:var(--ac);font-style:normal;font-family:'JetBrains Mono',monospace;font-size:12px}
+.c-bub code{background:rgba(0,0,0,.5);border:1px solid var(--b1);border-radius:5px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)}
+.c-bub pre{background:#000;border:1px solid var(--b2);border-radius:7px;padding:11px;margin-top:8px;overflow-x:auto}
+.c-bub pre code{background:none;border:none;padding:0;color:#a8ffcc;display:block;line-height:1.7}
+.c-bub ul{padding-left:16px;margin-top:4px}
+.c-bub ul li{margin-top:3px}
+.typing{display:flex;align-items:center;gap:4px;padding:3px 0}
+.td{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:tda 1.4s ease infinite}
+.td:nth-child(2){animation-delay:.22s}
+.td:nth-child(3){animation-delay:.44s}
+@keyframes tda{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+
+.chat-inp-area{border-top:1px solid var(--b1);padding:14px}
+.chat-ta{width:100%;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r);padding:11px 14px;font-size:13px;color:var(--t1);outline:none;resize:none;height:70px;transition:border .15s;line-height:1.5;font-family:'Cabinet Grotesk',sans-serif}
+.chat-ta:focus{border-color:var(--b3)}
+.chat-ta::placeholder{color:var(--t3)}
+.chat-acts{display:flex;gap:7px;margin-top:9px;align-items:center;flex-wrap:wrap}
+.btn-send{background:var(--ac);color:#000;border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:700;font-family:'Clash Display',sans-serif;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .12s}
+.btn-send:hover:not(:disabled){opacity:.88}
+.btn-send:disabled{opacity:.38;cursor:not-allowed}
+.chip{background:var(--s3);border:1px solid var(--b1);color:var(--t2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .12s}
+.chip:hover{border-color:var(--b3);color:var(--t1)}
+
+.qk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qk{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.qk::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--qk-col,var(--ac));transform:scaleX(0);transition:transform .2s}
+.qk:hover::before{transform:scaleX(1)}
+.qk:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-2px)}
+.qk i{font-size:22px;color:var(--ac);display:block;margin-bottom:10px}
+.qk-title{font-size:14px;font-weight:700;font-family:'Clash Display',sans-serif;margin-bottom:3px}
+.qk-desc{font-size:12px;color:var(--t3)}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat-c{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:14px;transition:all .15s}
+.stat-c:hover{border-color:var(--b2);transform:translateY(-1px)}
+.stat-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat-v{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--t1)}
+.stat-l{font-size:11px;color:var(--t3);margin-top:2px}
+.stat-d{font-size:11px;margin-top:4px}
+.up{color:var(--green)}.dn{color:var(--red)}
+
+/* Cards */
+.twoc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:18px}
+.card-tit{font-size:10px;color:var(--t2);font-family:'JetBrains Mono',monospace;letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-tit i{font-size:14px;color:var(--ac)}
+.pb-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.pb-lbl{font-size:12px;color:var(--t2);flex:0 0 100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-bar{flex:1;height:2px;background:var(--s4);border-radius:1px;overflow:hidden}
+.pb-fill{height:100%;border-radius:1px;transition:width .7s ease}
+.pb-pct{font-size:11px;font-family:'JetBrains Mono',monospace;min-width:30px;text-align:right}
+.sch-row{display:flex;gap:9px;margin-bottom:10px}
+.sch-t{font-size:10px;color:var(--t3);min-width:38px;font-family:'JetBrains Mono',monospace;padding-top:3px}
+.sch-c{flex:1;background:var(--s2);border-radius:6px;padding:9px 11px;border-left:2px solid}
+.sch-title{font-size:12px;font-weight:600;color:var(--t1)}
+.sch-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.sch-tag{font-size:10px;padding:2px 7px;border-radius:20px;margin-top:5px;display:inline-block;font-family:'JetBrains Mono',monospace}
+
+/* Syllabus */
+.syl-filt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.syl-fc{background:var(--s2);border:1px solid var(--b1);color:var(--t2);border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s}
+.syl-fc.active{background:var(--acd);border-color:rgba(200,255,87,.22);color:var(--ac)}
+.syl-fc:hover:not(.active){color:var(--t1);border-color:var(--b2)}
+.ch-list{display:flex;flex-direction:column;gap:6px}
+.ch-item{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.ch-item:hover{border-color:var(--b2);background:var(--s2);transform:translateX(3px)}
+.ch-item.cur{border-color:rgba(200,255,87,.2);background:var(--acd)}
+.ch-num{width:25px;height:25px;border-radius:6px;background:var(--s3);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.ch-item.cur .ch-num{background:var(--ac);color:#000}
+.ch-name{font-size:13px;font-weight:500;flex:1}
+.ch-meta{font-size:11px;color:var(--t3);margin-top:1px}
+.ch-tag{font-size:11px;padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* Resources */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.rc::after{content:'';position:absolute;inset:0;background:var(--rc-bg,transparent);opacity:0;transition:opacity .2s}
+.rc:hover{border-color:var(--b2);transform:translateY(-2px)}
+.rc:hover::after{opacity:1}
+.rc-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:11px;position:relative;z-index:1}
+.rc-title{font-size:13px;font-weight:700;font-family:'Clash Display',sans-serif;margin-bottom:3px;position:relative;z-index:1}
+.rc-desc{font-size:12px;color:var(--t3);line-height:1.5;position:relative;z-index:1}
+.rc-link{font-size:11px;font-weight:600;margin-top:8px;font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
+
+/* Quiz */
+.qcard{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:20px;margin-bottom:14px}
+.q-text{font-size:14px;line-height:1.7;color:var(--t1);margin-bottom:17px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{border:1.5px solid var(--b1);border-radius:var(--r);padding:11px 14px;font-size:13px;cursor:pointer;transition:all .12s;display:flex;align-items:flex-start;gap:9px;color:var(--t2);background:var(--s2)}
+.q-opt:hover:not(.locked){border-color:var(--b3);color:var(--t1)}
+.q-opt.correct{border-color:var(--green);background:var(--gd);color:var(--green)}
+.q-opt.wrong{border-color:var(--red);background:var(--rd);color:var(--red)}
+.q-opt.locked{cursor:default}
+.q-ol{width:22px;height:22px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.q-exp{background:var(--gd);border:1px solid rgba(61,255,160,.15);border-radius:9px;padding:13px;margin-top:12px;display:none;font-size:13px;color:var(--t1);line-height:1.7}
+.q-exp.show{display:block;animation:fi .2s ease}
+.qz-sel{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px 13px;font-size:13px;color:var(--t1);outline:none;-webkit-appearance:none;font-family:'Cabinet Grotesk',sans-serif;margin-top:7px}
+.qz-sel:focus{border-color:var(--ac)}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--rm);padding:13px 17px;font-size:13px;color:var(--t1);z-index:999;display:none;align-items:center;gap:9px;box-shadow:0 12px 40px rgba(0,0,0,.6);font-family:'Cabinet Grotesk',sans-serif}
+.toast.on{display:flex;animation:su .22s ease}
+@keyframes su{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+
+/* Celebratory confetti canvas */
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:998;display:none}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ═══════ HERO ═══════ -->
+<div id="pg-hero" class="page active">
+  <nav class="hero-nav">
+    <div class="logo">Ameyay</div>
+    <div class="nav-right">
+      <button class="btn-ghost" onclick="G('pg-goal')">Sign in</button>
+      <button class="btn-pill" onclick="G('pg-goal')">Get Started Free</button>
+    </div>
+  </nav>
+  <div style="overflow-y:auto;flex:1;">
+    <div class="hero-wrap">
+      <div class="hero-body">
+        <div>
+          <div class="hero-eyebrow"><div class="dot"></div> AI-Powered · Every Campus Worldwide</div>
+          <h1 class="hero-h1">Your personal AI tutor.<span class="line-ac">Built for every campus.</span></h1>
+          <p class="hero-sub">Enrol with your college ID. Set your exam deadline. Get a tutor that fights alongside you — whether you have a year or just one night.</p>
+          <div class="hero-ctas">
+            <button class="cta-primary" onclick="G('pg-goal')"><i class="ti ti-school" style="font-size:18px;"></i> Enrol with College ID</button>
+            <button class="cta-sec"><i class="ti ti-player-play" style="font-size:18px;"></i> Watch Demo</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hs"><span class="hs-n">500+</span><span class="hs-l">Colleges</span></div>
+            <div class="hs"><span class="hs-n">2M+</span><span class="hs-l">Students</span></div>
+            <div class="hs"><span class="hs-n">40+</span><span class="hs-l">Exams</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="chat-widget">
+            <div class="cw-bar">
+              <div class="cw-dots"><div class="cw-dot" style="background:#ff5f5f;"></div><div class="cw-dot" style="background:#ffbd2e;margin-left:5px;"></div><div class="cw-dot" style="background:#28c840;margin-left:5px;"></div></div>
+              <div class="cw-badge" style="margin-left:12px;">Scholar<em style="color:var(--ac);font-style:normal;">AI</em> Tutor</div>
+              <div class="cw-live"><div class="dot" style="width:6px;height:6px;margin:0;"></div>live</div>
+            </div>
+            <div class="cw-msgs">
+              <div class="cw-msg"><div class="cw-av ai-av"><i class="ti ti-robot" style="font-size:11px;"></i></div><div class="cw-bub">Hi! I'm tuned to your syllabus and exam deadline. What shall we tackle today?<div class="cw-mode-tag"><i class="ti ti-bolt" style="font-size:10px;"></i> exam_focused</div></div></div>
+              <div class="cw-msg u"><div class="cw-av u-av">ME</div><div class="cw-bub">Explain Snell's Law simply</div></div>
+              <div class="cw-msg"><div class="cw-av ai-av"><i class="ti ti-robot" style="font-size:11px;"></i></div><div class="cw-bub">Think of it like a straw bending in water 🥤. Light slows down when it enters a denser material and bends toward a line called the normal.<div class="cw-formula">n₁ sin θ₁ = n₂ sin θ₂</div>Your exam favourite: critical angle = sin⁻¹(n₂/n₁). Try a practice problem?</div></div>
+              <div class="cw-msg u"><div class="cw-av u-av">ME</div><div class="cw-bub">Yes! Give me one</div></div>
+              <div class="cw-msg"><div class="cw-av ai-av"><i class="ti ti-robot" style="font-size:11px;"></i></div><div class="cw-bub">Glass (n=1.5) to air (n=1). What is the critical angle? Try it! I'll verify your answer. ⚡</div></div>
+            </div>
+            <div class="cw-inp"><div class="cw-field">Ask anything about your syllabus…</div><div class="cw-send"><i class="ti ti-send" style="font-size:14px;"></i></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="feat-belt">
+        <div class="feat-label">everything you need to ace your exams</div>
+        <div class="feat-row">
+          <div class="fc star" style="--fc-color:var(--ac)">
+            <div class="fc-icon" style="background:var(--acm);"><i class="ti ti-robot" style="color:var(--ac);"></i></div>
+            <div class="fc-name">AI Tutor</div>
+            <div class="fc-desc">Real-time explanations adapted to your syllabus, learning style, and time left before exam.</div>
+          </div>
+          <div class="fc" style="--fc-color:var(--blue)">
+            <div class="fc-icon" style="background:var(--bd);"><i class="ti ti-alarm" style="color:var(--blue);"></i></div>
+            <div class="fc-name">Time Mode</div>
+            <div class="fc-desc">Set your deadline. AI builds a study plan — whether you have 1 night or 6 months.</div>
+          </div>
+          <div class="fc" style="--fc-color:var(--green)">
+            <div class="fc-icon" style="background:var(--gd);"><i class="ti ti-brain" style="color:var(--green);"></i></div>
+            <div class="fc-name">Smart Quizzes</div>
+            <div class="fc-desc">Fresh MCQs generated by AI every time. Instant explanations. GATE/JEE/NEET level.</div>
+          </div>
+          <div class="fc" style="--fc-color:var(--amber)">
+            <div class="fc-icon" style="background:var(--ad);"><i class="ti ti-school" style="color:var(--amber);"></i></div>
+            <div class="fc-name">College Sync</div>
+            <div class="fc-desc">Enrol with your college ID. Get your exact syllabus, marks sheet, and lab materials.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STEP 1: GOAL ═══════ -->
+<div id="pg-goal" class="page">
+  <div class="ob">
+    <div class="ob-logo">Ameyay</div>
+    <div class="ob-card">
+      <div class="ob-prog"><div class="prg now"></div><div class="prg"></div><div class="prg"></div><div class="prg"></div><div class="prg"></div></div>
+      <div class="ob-step">STEP 1 OF 5</div>
+      <div class="ob-h">What are you preparing for?</div>
+      <p class="ob-s">Your AI tutor and syllabus will be built around your goal.</p>
+      <div class="goal-grid">
+        <div class="gc" onclick="pickGoal('college',this)"><div class="gc-em">🎓</div><div><div class="gc-name">College Degree</div><div class="gc-desc">B.Tech, B.E., B.Sc, MBA and all university programmes</div></div></div>
+        <div class="gc" onclick="pickGoal('gate',this)"><div class="gc-em">⚙️</div><div><div class="gc-name">GATE 2025–27</div><div class="gc-desc">All branches: CS, ECE, ME, CE, IN, EE and more</div></div></div>
+        <div class="gc" onclick="pickGoal('jee',this)"><div class="gc-em">📐</div><div><div class="gc-name">JEE / JEE Advanced</div><div class="gc-desc">Physics, Chemistry, Mathematics — Mains &amp; Advanced</div></div></div>
+        <div class="gc" onclick="pickGoal('neet',this)"><div class="gc-em">🔬</div><div><div class="gc-name">NEET</div><div class="gc-desc">Biology, Physics, Chemistry for MBBS/BDS</div></div></div>
+        <div class="gc" onclick="pickGoal('boards',this)"><div class="gc-em">📚</div><div><div class="gc-name">Class 11 / 12 Boards</div><div class="gc-desc">CBSE, ICSE and all state boards</div></div></div>
+        <div class="gc" onclick="pickGoal('upsc',this)"><div class="gc-em">🏛️</div><div><div class="gc-name">UPSC / Civil Services</div><div class="gc-desc">Prelims, Mains, Optional subject prep</div></div></div>
+      </div>
+      <div class="ob-btns">
+        <button class="ob-back" onclick="G('pg-hero')"><i class="ti ti-arrow-left"></i></button>
+        <button class="ob-next" id="goal-next-btn" onclick="G('pg-college')" disabled>Continue <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STEP 2: COLLEGE ═══════ -->
+<div id="pg-college" class="page">
+  <div class="ob">
+    <div class="ob-logo">Ameyay</div>
+    <div class="ob-card">
+      <div class="ob-prog"><div class="prg done"></div><div class="prg now"></div><div class="prg"></div><div class="prg"></div><div class="prg"></div></div>
+      <div class="ob-step">STEP 2 OF 5</div>
+      <div class="ob-h" id="col-h">Search your college</div>
+      <p class="ob-s" id="col-s">Select your institution to sync your syllabus.</p>
+      <div class="cs-wrap"><i class="ti ti-search cs-icon"></i><input type="text" id="col-search" class="cs-inp" placeholder="Search name, city, type (IIT, NIT…)" autocomplete="off" aria-label="Search college"></div>
+      <div class="col-list" id="col-list"></div>
+      <div class="ob-btns">
+        <button class="ob-back" onclick="G('pg-goal')"><i class="ti ti-arrow-left"></i></button>
+        <button class="ob-next" id="col-next-btn" onclick="G('pg-id')" disabled>Continue <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STEP 3: ID ═══════ -->
+<div id="pg-id" class="page">
+  <div class="ob">
+    <div class="ob-logo">Ameyay</div>
+    <div class="ob-card">
+      <div class="ob-prog"><div class="prg done"></div><div class="prg done"></div><div class="prg now"></div><div class="prg"></div><div class="prg"></div></div>
+      <div class="ob-step">STEP 3 OF 5</div>
+      <div class="ob-h">Your college ID</div>
+      <p class="ob-s" id="id-sub">Enter your enrollment number to connect your academic record.</p>
+      <label class="ob-lbl">Enrollment / Student ID</label>
+      <input type="text" id="enroll-inp" class="ob-inp" placeholder="e.g. SCET2022045" maxlength="20" autocomplete="off">
+      <div class="id-ok" id="id-ok"><i class="ti ti-circle-check" style="font-size:17px;"></i> ID valid — ready to connect</div>
+      <div class="ob-info"><i class="ti ti-lock" style="font-size:15px;color:var(--t3);flex-shrink:0;margin-top:1px;"></i><p>Only used to personalise your syllabus. Never shared. You can skip and use Ameyay without linking your college record.</p></div>
+      <div class="ob-btns">
+        <button class="ob-back" onclick="G('pg-college')"><i class="ti ti-arrow-left"></i></button>
+        <button class="ob-skip" onclick="G('pg-time')">Skip</button>
+        <button class="ob-next" id="id-next-btn" onclick="G('pg-time')" disabled>Verify &amp; Continue <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STEP 4: TIME SELECTION ★★★ HERO FEATURE ═══════ -->
+<div id="pg-time" class="page">
+  <div class="time-page-wrap">
+    <div class="ob-logo">Ameyay</div>
+    <div class="ob-prog time-prog"><div class="prg done"></div><div class="prg done"></div><div class="prg done"></div><div class="prg now"></div><div class="prg"></div></div>
+    <div class="ob-step" style="text-align:center;">STEP 4 OF 5</div>
+    <div class="time-h">⏱ How much time do you have?</div>
+    <p class="time-sub">Be honest — your AI tutor will create a plan that actually fits. No judgment here.</p>
+
+    <div class="time-grid">
+      <!-- Night Before -->
+      <div class="tc" style="--tc-col:#ff5e6e;" onclick="pickTime(this,'night','😤 Survival Mode','var(--red)')">
+        <span class="tc-emoji">😤</span>
+        <div class="tc-time">1 Night</div>
+        <div class="tc-mode" style="color:#ff5e6e;">SURVIVAL MODE</div>
+        <div class="tc-desc">The exam is tomorrow. No shame. Let's make the most of tonight.</div>
+        <div class="tc-badge" style="border-color:rgba(255,94,110,.3);color:#ff8a94;">Most used the night before 😅</div>
+      </div>
+      <!-- 1 Week -->
+      <div class="tc" style="--tc-col:#ffc14d;" onclick="pickTime(this,'week','⚡ Rush Mode','var(--amber)')">
+        <span class="tc-emoji">⚡</span>
+        <div class="tc-time">1 Week</div>
+        <div class="tc-mode" style="color:#ffc14d;">RUSH MODE</div>
+        <div class="tc-desc">One week of intense, focused grind. High priority topics only.</div>
+        <div class="tc-badge" style="border-color:rgba(255,193,77,.3);color:#ffc14d;">Can cover 40% of syllabus</div>
+      </div>
+      <!-- 1 Month -->
+      <div class="tc" style="--tc-col:#c8ff57;" onclick="pickTime(this,'month','🔥 Grind Mode','var(--ac)')">
+        <span class="tc-emoji">🔥</span>
+        <div class="tc-time">1 Month</div>
+        <div class="tc-mode" style="color:#c8ff57;">GRIND MODE</div>
+        <div class="tc-desc">A solid month of consistent study. You can cover the full syllabus.</div>
+        <div class="tc-badge" style="border-color:rgba(200,255,87,.3);color:#c8ff57;">Most effective for passing</div>
+      </div>
+      <!-- 3 Months -->
+      <div class="tc" style="--tc-col:#3dffa0;" onclick="pickTime(this,'three_months','💪 Prep Mode','var(--green)')">
+        <span class="tc-emoji">💪</span>
+        <div class="tc-time">3 Months</div>
+        <div class="tc-mode" style="color:#3dffa0;">PREP MODE</div>
+        <div class="tc-desc">Serious preparation with revision cycles. Aim for top scores.</div>
+        <div class="tc-badge" style="border-color:rgba(61,255,160,.3);color:#3dffa0;">Recommended for GATE/JEE</div>
+      </div>
+      <!-- 6 Months -->
+      <div class="tc" style="--tc-col:#5b9cf6;" onclick="pickTime(this,'six_months','🎯 Strategy Mode','var(--blue)')">
+        <span class="tc-emoji">🎯</span>
+        <div class="tc-time">6 Months</div>
+        <div class="tc-mode" style="color:#5b9cf6;">STRATEGY MODE</div>
+        <div class="tc-desc">Strategic preparation. Multiple revision rounds. Mock tests.</div>
+        <div class="tc-badge" style="border-color:rgba(91,156,246,.3);color:#5b9cf6;">Ideal for competitive exams</div>
+      </div>
+      <!-- 1 Year+ -->
+      <div class="tc" style="--tc-col:#b794f4;" onclick="pickTime(this,'year','🏆 Champion Mode','var(--purple)')">
+        <span class="tc-emoji">🏆</span>
+        <div class="tc-time">1 Year+</div>
+        <div class="tc-mode" style="color:#b794f4;">CHAMPION MODE</div>
+        <div class="tc-desc">Long game. Deep understanding. Targeting top ranks. Respect.</div>
+        <div class="tc-badge" style="border-color:rgba(183,148,244,.3);color:#b794f4;">For IIT/AIIMS top ranks</div>
+      </div>
+    </div>
+
+    <!-- Preview of what the mode gives you -->
+    <div class="urgency-preview" id="urgency-preview">
+      <div class="up-head" id="up-head" style="color:var(--ac);">YOUR AI TUTOR WILL —</div>
+      <div class="up-tasks" id="up-tasks"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;width:100%;max-width:580px;">
+      <button class="ob-back" onclick="G('pg-id')"><i class="ti ti-arrow-left"></i></button>
+      <button class="ob-next" id="time-next-btn" onclick="G('pg-profile')" disabled>Set My Mode <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STEP 5: PROFILE ═══════ -->
+<div id="pg-profile" class="page">
+  <div class="ob">
+    <div class="ob-logo">Ameyay</div>
+    <div class="ob-card">
+      <div class="ob-prog"><div class="prg done"></div><div class="prg done"></div><div class="prg done"></div><div class="prg done"></div><div class="prg now"></div></div>
+      <div class="ob-step">STEP 5 OF 5</div>
+      <div class="ob-h">Almost there! 🎉</div>
+      <p class="ob-s">Set up your profile so your AI tutor knows who to root for.</p>
+      <div class="ob-field"><label for="pf-name">Your full name</label><input type="text" id="pf-name" placeholder="e.g. Rutal Patel" maxlength="50" autocomplete="name"></div>
+      <div class="ob-field"><label for="pf-branch">Branch / Stream</label><select id="pf-branch" aria-label="Branch"><option value="">— select branch —</option></select></div>
+      <div class="ob-field"><label for="pf-year">Year / Semester</label>
+        <select id="pf-year" aria-label="Year">
+          <option value="">— select year —</option>
+          <option>1st Year / Semester 1-2</option><option>2nd Year / Semester 3-4</option>
+          <option>3rd Year / Semester 5-6</option><option>4th Year / Semester 7-8</option>
+          <option>Postgraduate</option>
+        </select>
+      </div>
+      <div class="prev-box" id="prev-box">
+        <div class="prev-av" id="prev-av">?</div>
+        <div><div style="font-size:14px;font-weight:700;font-family:'Clash Display',sans-serif;" id="prev-name"></div><div style="font-size:12px;color:var(--t3);" id="prev-meta"></div></div>
+      </div>
+      <div class="ob-btns">
+        <button class="ob-back" onclick="G('pg-time')"><i class="ti ti-arrow-left"></i></button>
+        <button class="ob-next" id="pf-next-btn" onclick="launchApp()" disabled><i class="ti ti-rocket" style="font-size:16px;"></i> Launch My Workspace</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN APP ═══════ -->
+<div id="pg-app" class="page">
+  <div class="app-layout">
+    <div class="app-top">
+      <div class="app-logo">Ameyay</div>
+      <div class="app-search"><i class="ti ti-search" style="font-size:13px;color:var(--t3);"></i><input type="text" placeholder="search topics, formulas, chapters…" aria-label="Search"></div>
+      <div class="top-r">
+        <div class="streak-chip" id="app-streak">🔥 1d</div>
+        <div class="mode-chip" id="app-mode-chip" style="background:var(--acd);border-color:rgba(200,255,87,.25);color:var(--ac);">⏱ 1 Month</div>
+        <div class="top-bell"><i class="ti ti-bell" style="font-size:18px;color:var(--t2);cursor:pointer;"></i><span class="bell-dot"></span></div>
+        <div class="user-av" id="app-av" style="background:var(--ac);">?</div>
+      </div>
+    </div>
+
+    <div class="app-sb">
+      <div class="sb-user">
+        <div class="sb-u-tag" id="sb-tag">loading…</div>
+        <div class="sb-u-name" id="sb-name">—</div>
+        <div class="sb-u-sub" id="sb-sub">—</div>
+        <div class="sb-u-badge"><i class="ti ti-building" style="font-size:11px;"></i><span id="sb-badge">—</span></div>
+      </div>
+
+      <!-- Mode banner -->
+      <div class="sb-mode-banner" id="sb-mode-banner" style="background:linear-gradient(135deg,rgba(200,255,87,.12),rgba(200,255,87,.04));border:1px solid rgba(200,255,87,.2);" onclick="G('pg-time')">
+        <div class="sb-mode-time" id="sb-mode-time" style="color:var(--ac);">🔥 Grind Mode</div>
+        <div class="sb-mode-lbl" style="color:var(--ac);">1 Month to exam</div>
+        <div class="sb-mode-progress"><div class="sb-mode-fill" id="sb-mode-fill"></div></div>
+      </div>
+
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">learn</div>
+        <div class="sb-item active" id="nav-tutor" onclick="swP(this,'tutor')"><i class="ti ti-robot"></i> AI Tutor <span class="sb-badge">live</span></div>
+        <div class="sb-item" id="nav-syl" onclick="swP(this,'syl')"><i class="ti ti-books"></i> Syllabus</div>
+        <div class="sb-item" id="nav-res" onclick="swP(this,'res')"><i class="ti ti-file-stack"></i> Resources</div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">practice</div>
+        <div class="sb-item" id="nav-quiz" onclick="swP(this,'quiz')"><i class="ti ti-brain"></i> Quiz &amp; Tests</div>
+        <div class="sb-item" id="nav-cheat" onclick="swP(this,'cheat')"><i class="ti ti-notes"></i> Cheat Sheets</div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">track</div>
+        <div class="sb-item" id="nav-prog" onclick="swP(this,'prog')"><i class="ti ti-chart-bar"></i> Progress</div>
+      </div>
+      <div class="sb-foot">
+        <div class="plan-box">
+          <div class="plan-tag">plan</div>
+          <div class="plan-name">Free Plan</div>
+          <button class="plan-btn">Upgrade Pro ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-main" id="app-main">
+      <!-- TUTOR -->
+      <div class="panel active" id="p-tutor">
+        <div class="tutor-banner">
+          <div class="tb-eyebrow"><div class="dot" style="width:6px;height:6px;margin:0;"></div> your personal AI tutor</div>
+          <div class="tb-title" id="tutor-title">Ask me anything.</div>
+          <div class="tb-sub">I adapt to your learning style. Pick how you want me to explain:</div>
+          <div class="mode-pills">
+            <div class="mp active" onclick="setMode(this,'simple language')">simple language</div>
+            <div class="mp" onclick="setMode(this,'formula first')">formula first</div>
+            <div class="mp" onclick="setMode(this,'step by step')">step by step</div>
+            <div class="mp" onclick="setMode(this,'analogy mode')">analogy mode</div>
+            <div class="mp" onclick="setMode(this,'socratic method')">socratic</div>
+            <div class="mp" onclick="setMode(this,'exam focused')">exam focused</div>
+          </div>
+        </div>
+        <div class="chat-box">
+          <div class="chat-msgs" id="chat-msgs" role="log" aria-live="polite"></div>
+          <div class="chat-inp-area">
+            <textarea class="chat-ta" id="chat-inp" placeholder="ask anything — concepts, formulas, practice problems, previous year questions…" aria-label="Message to AI tutor"></textarea>
+            <div class="chat-acts">
+              <button class="btn-send" id="send-btn" onclick="sendMsg()"><i class="ti ti-send" style="font-size:13px;"></i> Ask</button>
+              <div class="chip" id="chip-sug"><i class="ti ti-wand" style="font-size:12px;"></i> Suggest topic</div>
+              <div class="chip" id="chip-prac"><i class="ti ti-file-pencil" style="font-size:12px;"></i> Practice Q</div>
+              <div class="chip" id="chip-pyq"><i class="ti ti-history" style="font-size:12px;"></i> PYQ</div>
+            </div>
+          </div>
+        </div>
+        <div class="qk-grid">
+          <div class="qk" id="qk1" style="--qk-col:var(--ac);"><i class="ti ti-file-pencil"></i><div class="qk-title">Practice Problems</div><div class="qk-desc">AI-generated questions tuned to your exam level</div></div>
+          <div class="qk" id="qk2" style="--qk-col:var(--amber);"><i class="ti ti-topology-star" style="color:var(--amber);"></i><div class="qk-title">Concept Map</div><div class="qk-desc">Visual topic connections for your chapter</div></div>
+          <div class="qk" id="qk3" style="--qk-col:var(--rose);"><i class="ti ti-history" style="color:var(--rose);"></i><div class="qk-title">PYQ Solver</div><div class="qk-desc">Previous year questions with full solutions</div></div>
+        </div>
+      </div>
+
+      <!-- SYLLABUS -->
+      <div class="panel" id="p-syl">
+        <div class="pg-h">Syllabus</div>
+        <div class="pg-s" id="syl-sub">Your enrolled college syllabus</div>
+        <div class="syl-filt" id="syl-filt"></div>
+        <div class="ch-list" id="ch-list"></div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div class="panel" id="p-res">
+        <div class="pg-h">Resources</div>
+        <div class="pg-s" id="res-sub">Tailored to your exam and time mode</div>
+        <div class="res-grid" id="res-grid"></div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="panel" id="p-quiz">
+        <div class="pg-h">Quiz &amp; Tests</div>
+        <div class="pg-s">AI-generated · live scoring · exam-style marking</div>
+        <div id="quiz-setup">
+          <div class="qcard">
+            <div class="card-tit"><i class="ti ti-settings"></i> quiz settings</div>
+            <div style="margin-bottom:13px;"><label class="ob-lbl" style="margin-bottom:5px;">Topic</label><select id="q-topic" class="qz-sel" aria-label="Topic"></select></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label class="ob-lbl" style="margin-bottom:5px;">Questions</label><select id="q-count" class="qz-sel"><option value="5">5 — quick</option><option value="10" selected>10 — standard</option><option value="15">15 — full</option></select></div>
+              <div><label class="ob-lbl" style="margin-bottom:5px;">Difficulty</label><select id="q-diff" class="qz-sel"><option value="moderate exam level">Moderate</option><option value="easy conceptual">Easy</option><option value="hard advanced">Hard</option></select></div>
+            </div>
+          </div>
+          <button class="btn-send" id="quiz-start-btn" onclick="startQuiz()" style="width:100%;justify-content:center;padding:14px;font-size:14px;border-radius:var(--rl);"><i class="ti ti-player-play" style="font-size:16px;"></i> Generate &amp; Start Quiz</button>
+          <div id="quiz-gen-msg" style="text-align:center;margin-top:12px;font-size:13px;color:var(--t3);display:none;font-family:'JetBrains Mono',monospace;">generating questions…</div>
+        </div>
+        <div id="quiz-run" style="display:none;">
+          <div style="display:flex;gap:4px;margin-bottom:16px;" id="q-prog-bar"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+            <div style="font-size:12px;color:var(--t2);">Q<span id="qn">1</span>/<span id="qt">10</span></div>
+            <div style="display:flex;align-items:center;gap:15px;">
+              <div style="font-size:12px;color:var(--t2);">Score: <span id="live-score" style="color:var(--ac);font-family:'JetBrains Mono',monospace;font-weight:700;">0</span></div>
+              <div id="q-timer" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--amber);" role="timer">2:00</div>
+            </div>
+          </div>
+          <div class="qcard">
+            <div class="q-text" id="q-text"></div>
+            <div class="q-opts" id="q-opts" role="radiogroup"></div>
+            <div class="q-exp" id="q-exp"></div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="skipQ()" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px;font-size:13px;cursor:pointer;color:var(--t2);">skip</button>
+            <button onclick="nextQ()" id="next-q-btn" style="flex:2;background:var(--ac);color:#000;border:none;border-radius:var(--r);padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Clash Display',sans-serif;" disabled>next →</button>
+          </div>
+        </div>
+        <div id="quiz-result" style="display:none;"></div>
+      </div>
+
+      <!-- CHEAT SHEETS -->
+      <div class="panel" id="p-cheat">
+        <div class="pg-h">Cheat Sheets</div>
+        <div class="pg-s">AI-generated quick reference · tailored to your exam</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+          <div id="cs-filter-bar" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+          <button class="btn-send" style="margin-left:auto;font-size:12px;padding:8px 14px;" onclick="customCS()"><i class="ti ti-wand" style="font-size:12px;"></i> Custom Topic</button>
+        </div>
+        <div id="cs-content"><div style="text-align:center;padding:44px;color:var(--t3);"><i class="ti ti-notes" style="font-size:36px;display:block;margin-bottom:12px;"></i>Select a topic above to generate your cheat sheet</div></div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="panel" id="p-prog">
+        <div class="pg-h">Progress Report</div>
+        <div class="pg-s" id="prog-sub">Your academic performance overview</div>
+        <div class="stat-grid">
+          <div class="stat-c"><div class="stat-ic" style="background:var(--acd);"><i class="ti ti-trophy" style="color:var(--ac);font-size:14px;"></i></div><div class="stat-v" id="st-xp">0</div><div class="stat-l">XP earned</div><div class="stat-d up">just started</div></div>
+          <div class="stat-c"><div class="stat-ic" style="background:var(--gd);"><i class="ti ti-book-open" style="color:var(--green);font-size:14px;"></i></div><div class="stat-v" id="st-syl">0%</div><div class="stat-l">Syllabus done</div><div class="stat-d up">keep going!</div></div>
+          <div class="stat-c"><div class="stat-ic" style="background:var(--bd);"><i class="ti ti-target" style="color:var(--blue);font-size:14px;"></i></div><div class="stat-v" id="st-quiz">—</div><div class="stat-l">Quiz avg</div><div class="stat-d" id="st-quiz-d" style="color:var(--t3);">no quizzes yet</div></div>
+          <div class="stat-c"><div class="stat-ic" style="background:var(--ad);"><i class="ti ti-flame" style="color:var(--amber);font-size:14px;"></i></div><div class="stat-v">1d</div><div class="stat-l">Streak</div><div class="stat-d up">just started!</div></div>
+        </div>
+        <div class="twoc">
+          <div class="card"><div class="card-tit"><i class="ti ti-chart-line"></i> subject progress</div><div id="prog-bars"></div></div>
+          <div class="card"><div class="card-tit"><i class="ti ti-history"></i> quiz history</div><div id="quiz-hist" style="font-size:13px;color:var(--t3);">No quizzes yet.</div></div>
+        </div>
+        <div style="border-radius:var(--rm);padding:16px;background:var(--acd);border:1px solid rgba(200,255,87,.18);">
+          <div style="font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;margin-bottom:7px;letter-spacing:.8px;">AI_INSIGHT</div>
+          <div id="insight-txt" style="font-size:13px;color:var(--t1);line-height:1.7;">Welcome! Start with the AI Tutor to build your personalised study plan. <span style="color:var(--ac);cursor:pointer;" onclick="swP(document.getElementById('nav-tutor'),'tutor')">Go to AI Tutor →</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ── STATE ── */
+var S={goal:null,college:null,studentId:'',name:'',branch:'',year:'',timeMode:null,timeLabel:'',timeColor:'var(--ac)',tutorMode:'simple language',chatHistory:[],quiz:{questions:[],current:0,score:0,answers:[],timer:null,timeLeft:120},quizStats:{attempts:0,scores:[],history:[]},xp:0,csCurrentTopic:''};
+
+var COLLEGES=[
+  {id:1,name:'IIT Bombay',short:'IITB',city:'Mumbai',state:'Maharashtra',type:'IIT'},
+  {id:2,name:'IIT Delhi',short:'IITD',city:'New Delhi',state:'Delhi',type:'IIT'},
+  {id:3,name:'IIT Madras',short:'IITM',city:'Chennai',state:'Tamil Nadu',type:'IIT'},
+  {id:4,name:'IIT Kharagpur',short:'IITKGP',city:'Kharagpur',state:'West Bengal',type:'IIT'},
+  {id:5,name:'IIT Kanpur',short:'IITK',city:'Kanpur',state:'UP',type:'IIT'},
+  {id:6,name:'IIT Roorkee',short:'IITR',city:'Roorkee',state:'Uttarakhand',type:'IIT'},
+  {id:7,name:'IIT Hyderabad',short:'IITH',city:'Hyderabad',state:'Telangana',type:'IIT'},
+  {id:8,name:'SVNIT Surat',short:'SVNIT',city:'Surat',state:'Gujarat',type:'NIT'},
+  {id:9,name:'NIT Trichy',short:'NITT',city:'Tiruchirappalli',state:'Tamil Nadu',type:'NIT'},
+  {id:10,name:'NIT Warangal',short:'NITW',city:'Warangal',state:'Telangana',type:'NIT'},
+  {id:11,name:'BITS Pilani',short:'BITS',city:'Pilani',state:'Rajasthan',type:'Deemed'},
+  {id:12,name:'VIT Vellore',short:'VIT',city:'Vellore',state:'Tamil Nadu',type:'Private'},
+  {id:13,name:'SCET Surat',short:'SCET',city:'Surat',state:'Gujarat',type:'Private'},
+  {id:14,name:'Nirma University',short:'NU',city:'Ahmedabad',state:'Gujarat',type:'Deemed'},
+  {id:15,name:'GTU',short:'GTU',city:'Ahmedabad',state:'Gujarat',type:'State'},
+  {id:16,name:'DTU Delhi',short:'DTU',city:'New Delhi',state:'Delhi',type:'State'},
+  {id:17,name:'Jadavpur University',short:'JU',city:'Kolkata',state:'West Bengal',type:'State'},
+  {id:18,name:'Anna University',short:'AU',city:'Chennai',state:'Tamil Nadu',type:'State'},
+  {id:19,name:'IIIT Hyderabad',short:'IIITH',city:'Hyderabad',state:'Telangana',type:'IIIT'},
+  {id:20,name:'SRM Institute',short:'SRMIST',city:'Chennai',state:'Tamil Nadu',type:'Deemed'},
+  {id:21,name:'Manipal Institute',short:'MIT',city:'Manipal',state:'Karnataka',type:'Deemed'},
+  {id:22,name:'PES University',short:'PESU',city:'Bengaluru',state:'Karnataka',type:'Private'},
+  {id:23,name:'Chandigarh University',short:'CU',city:'Chandigarh',state:'Punjab',type:'Private'},
+  {id:24,name:'Amity University',short:'Amity',city:'Noida',state:'UP',type:'Private'},
+  {id:25,name:'MIT Massachusetts',short:'MIT',city:'Cambridge',state:'USA',type:'International'},
+  {id:26,name:'Stanford University',short:'Stanford',city:'Palo Alto',state:'USA',type:'International'},
+  {id:27,name:'IIM Ahmedabad',short:'IIMA',city:'Ahmedabad',state:'Gujarat',type:'IIM'},
+  {id:28,name:'IIM Bangalore',short:'IIMB',city:'Bengaluru',state:'Karnataka',type:'IIM'},
+  {id:29,name:'Thapar University',short:'TIET',city:'Patiala',state:'Punjab',type:'Deemed'},
+  {id:30,name:'COEP Pune',short:'COEP',city:'Pune',state:'Maharashtra',type:'State'}
+];
+var POPULAR=[1,2,3,8,9,11,12,13,16,19];
+
+var BRANCHES={college:['Computer Science Engineering','Electronics & Communication Engineering','Mechanical Engineering','Civil Engineering','Electrical Engineering','Instrumentation & Control Engineering','Information Technology','Chemical Engineering','Biotechnology','Other'],gate:['Computer Science (CS)','Electronics & Communication (ECE)','Mechanical Engineering (ME)','Civil Engineering (CE)','Electrical Engineering (EE)','Instrumentation Engineering (IN)','Chemical Engineering (CH)','Other'],jee:['PCM — Physics, Chemistry, Mathematics'],neet:['PCB — Physics, Chemistry, Biology'],boards:['Science (PCM)','Science (PCB)','Commerce','Arts / Humanities'],upsc:['General Studies','History Optional','Geography Optional','Public Administration Optional','Other']};
+
+var SUBJECTS={
+  college:{filters:['all','core','maths','lab'],chapters:[{n:'01',name:'Data Structures & Algorithms',meta:'Core · 8 topics',cat:'core',st:'done',pct:88},{n:'02',name:'Engineering Mathematics III',meta:'Maths · 6 topics',cat:'maths',st:'done',pct:76},{n:'03',name:'Operating Systems',meta:'Core · 7 topics',cat:'core',st:'cur',pct:52},{n:'04',name:'Digital Logic Design',meta:'Core · 6 topics',cat:'core',st:'done',pct:91},{n:'05',name:'Computer Networks',meta:'Core · 8 topics',cat:'core',st:'pending',pct:0},{n:'06',name:'Database Management Systems',meta:'Core · 6 topics',cat:'core',st:'pending',pct:0},{n:'L1',name:'Data Structures Lab',meta:'Lab · 10 experiments',cat:'lab',st:'done',pct:100}]},
+  gate:{filters:['all','control','inst','signals','analog'],chapters:[{n:'01',name:'Laplace Transform & Transfer Functions',meta:'Control Systems · 28 PYQs',cat:'control',st:'done',pct:89},{n:'02',name:'Block Diagram & Signal Flow Graph',meta:'Control Systems · 22 PYQs',cat:'control',st:'done',pct:76},{n:'03',name:'PID Controller Design',meta:'Control Systems · 31 PYQs',cat:'control',st:'cur',pct:55},{n:'04',name:'Bode Plot & Frequency Response',meta:'Control Systems · 26 PYQs',cat:'control',st:'weak',pct:38},{n:'05',name:'RTD, Thermocouple & LVDT',meta:'Instrumentation · 35 PYQs',cat:'inst',st:'pending',pct:0},{n:'06',name:'Fourier Series & Transform',meta:'Signals · 24 PYQs',cat:'signals',st:'done',pct:82},{n:'07',name:'Op-Amp Circuits',meta:'Analog Electronics · 24 PYQs',cat:'analog',st:'pending',pct:0}]},
+  jee:{filters:['all','physics','chemistry','maths'],chapters:[{n:'01',name:'Kinematics & Laws of Motion',meta:'Physics · 40 PYQs',cat:'physics',st:'done',pct:82},{n:'02',name:'Electrostatics & Capacitance',meta:'Physics · 35 PYQs',cat:'physics',st:'cur',pct:60},{n:'03',name:'Organic Chemistry',meta:'Chemistry · 45 PYQs',cat:'chemistry',st:'pending',pct:0},{n:'04',name:'Integral Calculus',meta:'Mathematics · 30 PYQs',cat:'maths',st:'done',pct:75},{n:'05',name:'Wave Optics',meta:'Physics · 22 PYQs',cat:'physics',st:'pending',pct:0}]},
+  neet:{filters:['all','biology','physics','chemistry'],chapters:[{n:'01',name:'Cell Biology & Division',meta:'Biology · 48 PYQs',cat:'biology',st:'done',pct:85},{n:'02',name:'Human Physiology',meta:'Biology · 60 PYQs',cat:'biology',st:'cur',pct:45},{n:'03',name:'Genetics & Evolution',meta:'Biology · 35 PYQs',cat:'biology',st:'pending',pct:0},{n:'04',name:'Laws of Motion',meta:'Physics · 30 PYQs',cat:'physics',st:'done',pct:70},{n:'05',name:'Chemical Bonding',meta:'Chemistry · 28 PYQs',cat:'chemistry',st:'pending',pct:0}]},
+  boards:{filters:['all','physics','chemistry','maths'],chapters:[{n:'01',name:'Electric Charges and Fields',meta:'Physics · Ch 1',cat:'physics',st:'done',pct:90},{n:'02',name:'Current Electricity',meta:'Physics · Ch 3',cat:'physics',st:'cur',pct:55},{n:'03',name:'p-Block Elements',meta:'Chemistry · Ch 7',cat:'chemistry',st:'pending',pct:0},{n:'04',name:'Relations and Functions',meta:'Maths · Ch 1',cat:'maths',st:'done',pct:80}]},
+  upsc:{filters:['all','gs1','gs2','gs3','gs4'],chapters:[{n:'01',name:'Indian History — Ancient & Medieval',meta:'GS 1',cat:'gs1',st:'done',pct:65},{n:'02',name:'Indian Constitution & Polity',meta:'GS 2',cat:'gs2',st:'cur',pct:40},{n:'03',name:'Indian Economy',meta:'GS 3',cat:'gs3',st:'pending',pct:0},{n:'04',name:'Ethics & Aptitude',meta:'GS 4',cat:'gs4',st:'pending',pct:0}]}
+};
+
+var TIME_MODES={
+  night:{label:'😤 Survival Mode',short:'1 Night',color:'var(--red)',tasks:['Focus only on the highest-weightage 20% of topics','Give you a crash cheat sheet for tonight','Skip everything non-essential','Quiz you on the most likely exam questions','Keep explanations super short — no fluff'],urgency:'extreme'},
+  week:{label:'⚡ Rush Mode',short:'1 Week',color:'var(--amber)',tasks:['Build a 7-day sprint plan, topic by topic','Cover the highest-yield 40% of syllabus','Give you daily targets and quiz checkpoints','Use formula-first explanations to save time','Flag previous year questions with patterns'],urgency:'high'},
+  month:{label:'🔥 Grind Mode',short:'1 Month',color:'var(--ac)',tasks:['Create a full 30-day chapter-by-chapter plan','Cover the complete syllabus with revision time','Give you weekly mock tests to track progress','Build formula sheets and cheat sheets per chapter','Identify and eliminate your weak areas'],urgency:'medium'},
+  three_months:{label:'💪 Prep Mode',short:'3 Months',color:'var(--green)',tasks:['Structured preparation with 2 full revision rounds','Deep understanding + problem-solving practice','Monthly mock tests with performance analysis','All previous year questions solved and discussed','Build speed and accuracy together'],urgency:'moderate'},
+  six_months:{label:'🎯 Strategy Mode',short:'6 Months',color:'var(--blue)',tasks:['Strategic topic prioritisation by exam weight','3 complete revision cycles with increasing depth','Bi-weekly mocks with detailed error analysis','Cross-topic connections and concept mastery','Build 90th+ percentile performance steadily'],urgency:'low'},
+  year:{label:'🏆 Champion Mode',short:'1 Year+',color:'var(--purple)',tasks:['Complete mastery of every chapter and sub-topic','Deep conceptual understanding, not just formulas','Regular mocks from Day 1 to build exam instinct','Track long-term weak areas with spaced repetition','Aim for AIR Top 100 / AIIMS / IIT Bombay level'],urgency:'relaxed'}
+};
+
+/* ── UTILS ── */
+function el(id){return document.getElementById(id);}
+function G(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});var t=el(id);if(t){t.classList.add('active');try{t.scrollTop=0;}catch(e){}}}
+window.G=G;
+function toast(msg,icon){var t=el('toast');if(!t)return;t.innerHTML='<i class="ti ti-'+(icon||'info-circle')+'" style="color:var(--ac);font-size:15px;"></i> '+msg;t.classList.add('on');clearTimeout(t._to);t._to=setTimeout(function(){t.classList.remove('on');},3200);}
+function fmt(txt){return txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>').replace(/^### (.*$)/gm,'<div style="color:var(--ac);font-family:JetBrains Mono,monospace;font-size:11px;font-weight:500;margin:9px 0 4px;text-transform:uppercase;letter-spacing:.5px;">$1</div>').replace(/^- (.*$)/gm,'<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:var(--ac);">—</span><span>$1</span></div>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');}
+
+/* ── GOAL ── */
+function pickGoal(g,el_){S.goal=g;document.querySelectorAll('.gc').forEach(function(c){c.classList.remove('sel');});el_.classList.add('sel');el('goal-next-btn').disabled=false;var l={college:['Search your university','Select your institution to sync your syllabus.'],gate:['Search your college','Select where you study while preparing for GATE.'],jee:['Search your school or coaching','Select your coaching centre or school.'],neet:['Search your school or coaching','Select your coaching centre or school.'],boards:['Search your school','Select your school to sync your board syllabus.'],upsc:['Search your coaching','Select your coaching institute.']};var ll=l[g]||l['college'];el('col-h').textContent=ll[0];el('col-s').textContent=ll[1];populateBranches(g);}
+window.pickGoal=pickGoal;
+
+/* ── COLLEGE ── */
+function renderCols(q){q=(q||'').toLowerCase().trim();var c=el('col-list');if(!c)return;var html;if(!q){var pop=COLLEGES.filter(function(x){return POPULAR.indexOf(x.id)!==-1;});html='<div class="col-lbl">⭐ Popular</div>'+pop.map(colH).join('')+'<div class="col-lbl" style="margin-top:7px;">All Institutions</div>'+COLLEGES.map(colH).join('');}else{var list=COLLEGES.filter(function(x){return x.name.toLowerCase().indexOf(q)!==-1||x.city.toLowerCase().indexOf(q)!==-1||x.type.toLowerCase().indexOf(q)!==-1||x.short.toLowerCase().indexOf(q)!==-1;});html=list.length===0?'<div class="no-col"><i class="ti ti-search-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>No colleges found for "'+q+'"<br><button class="no-col-btn" onclick="reqCol()">Request my college ↗</button></div>':list.map(colH).join('');}c.innerHTML=html;if(S.college){var s=c.querySelector('[data-cid="'+S.college.id+'"]');if(s)s.classList.add('sel');}}
+function colH(c){return '<div class="col-item" data-cid="'+c.id+'" onclick="pickCol('+c.id+')" tabindex="0" role="button"><div class="col-type">'+c.type+'</div><div style="flex:1;"><div class="col-name">'+c.name+'</div><div class="col-city">'+c.city+', '+c.state+'</div></div><i class="ti ti-circle-check col-chk"></i></div>';}
+function pickCol(id){var c=COLLEGES.filter(function(x){return x.id===id;})[0];if(!c)return;S.college=c;document.querySelectorAll('.col-item').forEach(function(x){x.classList.remove('sel');});var s=document.querySelector('[data-cid="'+id+'"]');if(s)s.classList.add('sel');el('col-next-btn').disabled=false;var sub=el('id-sub');if(sub)sub.textContent='Enter your enrollment number to connect your '+c.name+' academic record.';}
+window.pickCol=pickCol;
+function reqCol(){toast('College request submitted! Added within 24 hours.','check');}
+window.reqCol=reqCol;
+
+/* ── ID ── */
+(function(){var inp=el('enroll-inp'),next=el('id-next-btn'),ok=el('id-ok');if(!inp)return;inp.addEventListener('input',function(){S.studentId=inp.value.trim();var v=S.studentId.length>=4&&/^[A-Za-z0-9_-]+$/.test(S.studentId);next.disabled=!v;ok.style.display=v?'flex':'none';});})();
+// Backend API override
+window._callAPIBackend = async function(messages, tutorMode, state){
+  var token=localStorage.getItem('ameyay_token')||'';
+  var r=await fetch('/api/tutor/chat',{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({message:messages[messages.length-1].content,
+      history:messages.slice(0,-1),tutorMode:tutorMode||'simple language',
+      goal:state&&state.goal,name:state&&state.name,
+      college:state&&state.college?state.college.name:'',
+      branch:state&&state.branch,timeMode:state&&state.timeMode})});
+  if(!r.ok){var e={};try{e=await r.json();}catch(_){}throw new Error((e.error&&e.error.message)||'AI error '+r.status);}
+  var d=await r.json();return d.reply;
+};
+
+/* ── TIME MODE ── */
+function pickTime(el_,mode,label,color){
+  S.timeMode=mode;S.timeLabel=label;S.timeColor=color;
+  document.querySelectorAll('.tc').forEach(function(c){c.classList.remove('sel');});
+  el_.classList.add('sel');
+  el('time-next-btn').disabled=false;
+  var m=TIME_MODES[mode];
+  var prev=el('urgency-preview');
+  prev.classList.add('show');
+  el('up-head').textContent='YOUR AI TUTOR WILL —';
+  el('up-head').style.color=m.color;
+  el('up-tasks').innerHTML=m.tasks.map(function(t){
+    return '<div class="up-task" style="border-color:'+m.color+';"><i class="ti ti-check" style="color:'+m.color+';font-size:13px;"></i> '+t+'</div>';
+  }).join('');
+  // Update next button color
+  var nb=el('time-next-btn');
+  nb.textContent='Set '+label.split(' ').slice(1).join(' ')+' ↗';
+  nb.style.background=m.color==='var(--red)'?'#ff5e6e':m.color==='var(--amber)'?'#ffc14d':m.color==='var(--ac)'?'var(--ac)':m.color==='var(--green)'?'#3dffa0':m.color==='var(--blue)'?'#5b9cf6':'#b794f4';
+}
+window.pickTime=pickTime;
+
+/* ── PROFILE ── */
+function populateBranches(g){var sel=el('pf-branch');if(!sel)return;var opts=BRANCHES[g]||BRANCHES['college'];sel.innerHTML='<option value="">— select branch —</option>'+opts.map(function(b){return '<option value="'+b+'">'+b+'</option>';}).join('');}
+
+(function(){var ni=el('pf-name'),bi=el('pf-branch'),yi=el('pf-year'),nb=el('pf-next-btn');if(!ni)return;function chk(){var n=ni.value.trim(),b=bi.value,y=yi.value;nb.disabled=!(n.length>=2&&b&&y);if(n.length>=2){S.name=n;S.branch=b;S.year=y;el('prev-av').textContent=n.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'?';el('prev-name').textContent=n;el('prev-meta').textContent=(b?b:'')+(S.college?' · '+S.college.short:'');el('prev-box').style.display='flex';}else{el('prev-box').style.display='none';}}ni.addEventListener('input',chk);bi.addEventListener('change',chk);yi.addEventListener('change',chk);})();
+
+/* ── LAUNCH ── */
+function launchApp(){var ni=el('pf-name'),bi=el('pf-branch'),yi=el('pf-year');if(ni)S.name=ni.value.trim();if(bi)S.branch=bi.value;if(yi)S.year=yi.value;G('pg-app');initApp();confetti();}
+window.launchApp=launchApp;
+
+/* ── CONFETTI ── */
+function confetti(){var canvas=el('confetti-canvas');if(!canvas)return;canvas.style.display='block';var ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;var parts=[];for(var i=0;i<120;i++){parts.push({x:Math.random()*canvas.width,y:-10,r:Math.random()*6+2,d:Math.random()*3+1,color:['#c8ff57','#3dffa0','#5b9cf6','#b794f4','#ffc14d','#ff6eb4'][Math.floor(Math.random()*6)],tilt:Math.random()*10-5,tiltAngle:0,tiltAngleInc:Math.random()*.07+.05});}var frame=0;function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);parts.forEach(function(p){ctx.beginPath();ctx.lineWidth=p.r/2;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/3,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/5);ctx.stroke();});parts.forEach(function(p){p.tiltAngle+=p.tiltAngleInc;p.y+=Math.cos(frame/10)+p.d;p.x+=Math.sin(frame/5);p.tilt=Math.sin(p.tiltAngle)*12;});frame++;if(frame<180)requestAnimationFrame(draw);else canvas.style.display='none';}draw();}
+
+/* ── APP INIT ── */
+function initApp(){
+  var g=S.goal||'college';
+  var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];
+  var col=S.college;
+  var initials=(S.name||'').split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'?';
+
+  el('app-av').textContent=initials;
+  el('app-av').style.background=m.color==='var(--ac)'?'var(--ac)':'var(--ac)';
+  el('sb-tag').textContent=g.toUpperCase()+' · '+(S.year?S.year.split(' ')[0]:'');
+  el('sb-name').textContent=S.name||'Student';
+  el('sb-sub').textContent=S.studentId||'No ID linked';
+  el('sb-badge').textContent=(col?col.short:'Independent')+' · '+(S.branch?S.branch.split(' ').slice(0,2).join(' '):'All Subjects');
+
+  // Mode chip in topbar
+  el('app-mode-chip').textContent=m.label;
+  el('app-mode-chip').style.background=m.color+'22';
+  el('app-mode-chip').style.borderColor=m.color+'55';
+  el('app-mode-chip').style.color=m.color;
+
+  // Sidebar mode banner
+  el('sb-mode-time').textContent=m.label;
+  el('sb-mode-time').style.color=m.color;
+  var fill={night:95,week:75,month:50,three_months:35,six_months:20,year:10}[S.timeMode||'month'];
+  setTimeout(function(){el('sb-mode-fill').style.width=fill+'%';},500);
+
+  var exam={college:'your '+((col&&col.name)||'college')+' syllabus',gate:'GATE 2027 — '+(S.branch||'your paper'),jee:'JEE / JEE Advanced',neet:'NEET',boards:'Class 11/12',upsc:'UPSC Civil Services'}[g]||'your syllabus';
+
+  var urgencyMsg={night:'⚠️ Exam is TONIGHT. No time to waste.',week:'⚡ One week left. Laser focus only.',month:'🔥 One month. Let\'s cover everything.',three_months:'💪 Three months — serious prep begins.',six_months:'🎯 Six months to build mastery.',year:'🏆 A full year. Let\'s aim for the top.'}[S.timeMode||'month'];
+
+  el('tutor-title').textContent='Ask me anything, '+(S.name?S.name.split(' ')[0]:'Student')+'.';
+  addMsg('ai','Hi <strong>'+(S.name||'there')+'</strong>! 👋<br><br>'+urgencyMsg+'<br><br>I\'m your AI tutor for <strong>'+exam+'</strong> in <em>'+m.label+'</em>. I\'ll adapt everything to your timeline.<br><br>Ask me anything — concepts, formulas, practice problems, or just what to study first.');
+
+  // Chips
+  var sug='Suggest the most important topic to study right now for '+exam+' given I have '+m.short;
+  var prac='Give me 3 '+({night:'fast, high-yield',week:'focused',month:'comprehensive',three_months:'thorough',six_months:'deep',year:'master-level'}[S.timeMode||'month'])+' practice problems for '+(S.branch||'my subject');
+  var pyq='Show me a previous year exam question from '+(g==='gate'?'GATE IN':g==='jee'?'JEE':g==='neet'?'NEET':'my exam')+' with complete solution';
+  el('chip-sug').onclick=function(){qAsk(sug);};
+  el('chip-prac').onclick=function(){qAsk(prac);};
+  el('chip-pyq').onclick=function(){qAsk(pyq);};
+  el('qk1').onclick=function(){qAsk(prac);};
+  el('qk2').onclick=function(){qAsk('Create a concept map for the most important chapter in my '+exam+' syllabus');};
+  el('qk3').onclick=function(){qAsk(pyq);};
+
+  buildSyl();buildRes();buildQuizTopics();buildCSFilters();buildProgBars();
+  try{var qs=sessionStorage.getItem('sai_qs');if(qs)S.quizStats=JSON.parse(qs);}catch(e){}
+  renderQuizHist();
+}
+
+/* ── PANEL SWITCH ── */
+function swP(navEl,pId){document.querySelectorAll('.sb-item').forEach(function(n){n.classList.remove('active');});if(navEl)navEl.classList.add('active');document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});var t=el('p-'+pId);if(t){t.classList.add('active');var m=el('app-main');if(m)m.scrollTop=0;}}
+window.swP=swP;
+
+/* ── TUTOR MODE ── */
+function setMode(el_,m){document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});el_.classList.add('active');S.tutorMode=m;toast('Mode: '+m,'check');}
+window.setMode=setMode;
+
+/* ── API ── */
+var API='/api/tutor/chat',GEN='/api/tutor/generate',QUIZ='/api/quiz/generate';
+function sysPmt(){var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={college:(S.college?S.college.name:'')+' '+(S.branch||''),gate:'GATE 2027 Paper '+(S.branch||'IN'),jee:'JEE / JEE Advanced',neet:'NEET',boards:'Class 11/12',upsc:'UPSC Civil Services'}[g]||'exam';return 'You are Ameyay, a personal AI tutor for '+(S.name||'a student')+' preparing for '+exam+'.\n\nTime Mode: '+m.label+' ('+m.short+' to exam) — urgency: '+m.urgency+'\nExplanation mode: '+S.tutorMode+'\n\nBased on urgency "'+m.urgency+'", adjust response style: '+{extreme:'Ultra-concise. Only what\'s needed for tonight. No fluff.',high:'Fast-paced. Focus on high-yield content only.',medium:'Balanced. Cover topics properly but stay focused.',moderate:'Thorough but engaging. Build real understanding.',low:'Deep and strategic. Master concepts, not just surface.',relaxed:'Comprehensive. Build from fundamentals to advanced.'}[m.urgency]+'\n\nUse **bold** for key terms, `code` for formulas. Be encouraging and exam-focused.';}
+async function callAPI(messages){var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:MDL,max_tokens:1200,system:sysPmt(),messages:messages})});if(!r.ok){var e={};try{e=await r.json();}catch(_){}throw new Error((e.error&&e.error.message)||'API error '+r.status);}var d=await r.json();return d.content[0].text;}
+
+/* ── CHAT ── */
+function addMsg(role,content,isTyping){var ca=el('chat-msgs');if(!ca)return null;var div=document.createElement('div');div.className='chat-msg'+(role==='user'?' u':'');if(isTyping)div.id='typing-ind';var initials=(S.name||'').split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2)||'ME';var av=role==='user'?'<div class="c-av c-u">'+initials+'</div>':'<div class="c-av c-ai"><i class="ti ti-robot" style="font-size:11px;"></i></div>';var bub=isTyping?'<div class="c-bub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>':'<div class="c-bub">'+fmt(content)+'</div>';div.innerHTML=role==='user'?bub+av:av+bub;ca.appendChild(div);ca.scrollTop=ca.scrollHeight;return div;}
+async function sendMsg(){var inp=el('chat-inp'),btn=el('send-btn');if(!inp||!btn)return;var msg=inp.value.trim();if(!msg)return;inp.value='';btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin" style="font-size:13px;"></i> Thinking…';addMsg('user',msg);S.chatHistory.push({role:'user',content:msg});addMsg('ai','',true);try{var reply=await callAPI(S.chatHistory);var t=el('typing-ind');if(t)t.remove();addMsg('ai',reply);S.chatHistory.push({role:'assistant',content:reply});if(S.chatHistory.length>24)S.chatHistory=S.chatHistory.slice(-24);S.xp+=10;el('st-xp').textContent=S.xp;}catch(e){var t2=el('typing-ind');if(t2)t2.remove();addMsg('ai','Error: **'+e.message+'** — please try again.');}btn.disabled=false;btn.innerHTML='<i class="ti ti-send" style="font-size:13px;"></i> Ask';inp.focus();}
+window.sendMsg=sendMsg;
+function qAsk(p){swP(el('nav-tutor'),'tutor');el('chat-inp').value=p;sendMsg();}
+window.qAsk=qAsk;
+var ci=el('chat-inp');if(ci){ci.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});}
+
+/* ── SYLLABUS ── */
+function buildSyl(){var g=S.goal||'college',data=SUBJECTS[g]||SUBJECTS['college'];el('syl-sub').textContent=(S.college?S.college.name:'Your')+' · '+(S.branch||'All Subjects');var fb=el('syl-filt');if(!fb)return;fb.innerHTML=data.filters.map(function(f,i){return '<div class="syl-fc'+(i===0?' active':'')+'" onclick="filtSyl(this,\''+f+'\')">'+(f.replace(/_/g,' '))+'</div>';}).join('');renderChs('all',data.chapters);}
+function renderChs(cat,chapters){var g=S.goal||'college',data=SUBJECTS[g]||SUBJECTS['college'];var chs=chapters||data.chapters;var list=cat==='all'?chs:chs.filter(function(c){return c.cat===cat;});var cl=el('ch-list');if(!cl)return;if(!list.length){cl.innerHTML='<div style="text-align:center;padding:28px;color:var(--t3);">No chapters here yet.</div>';return;}cl.innerHTML=list.map(function(c){var ts=c.st==='done'?'background:var(--gd);color:var(--green);':c.st==='cur'?'background:var(--acd);color:var(--ac);':c.st==='weak'?'background:var(--rd);color:var(--red);':'background:var(--s3);color:var(--t3);';var tt=c.st==='done'?'done · '+c.pct+'%':c.st==='cur'?'in progress · '+c.pct+'%':c.st==='weak'?'weak · '+c.pct+'%':'pending';return '<div class="ch-item'+(c.st==='cur'?' cur':'')+'" onclick="openCh(\''+c.name.replace(/'/g,"\\'")+'\')"><div class="ch-num">'+c.n+'</div><div style="flex:1;"><div class="ch-name">'+c.name+'</div><div class="ch-meta">'+c.meta+'</div></div><div class="ch-tag" style="'+ts+'">'+tt+'</div></div>';}).join('');}
+function filtSyl(el_,cat){document.querySelectorAll('.syl-fc').forEach(function(f){f.classList.remove('active');});el_.classList.add('active');renderChs(cat);}
+window.filtSyl=filtSyl;
+function openCh(name){var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];qAsk('Teach me "'+name+'" from my syllabus. Given I have '+m.short+' to exam ('+m.urgency+' urgency), give me: 1) Key concepts 2) Most important formulas 3) Solved example 4) One practice problem with solution');}
+window.openCh=openCh;
+
+/* ── RESOURCES ── */
+function buildRes(){var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={gate:'GATE IN 2027',jee:'JEE',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'my exam'}[g]||'my exam';el('res-sub').textContent='Tailored for '+exam+' · '+m.label;var rg=el('res-grid');if(!rg)return;var items=[{ic:'ti-file-description',col:'var(--ac)',bg:'var(--acd)',title:'Sample Papers',desc:'AI-generated papers adapted to your '+m.short+' timeline',link:'generate now ↗',q:'Generate a '+exam+' sample paper. I have '+m.short+' left. Focus on '+(m.urgency==='extreme'||m.urgency==='high'?'the highest-yield topics only':'the complete syllabus')},
+{ic:'ti-award',col:'var(--amber)',bg:'var(--ad)',title:'PYQ Bank',desc:'Previous year questions with solutions',link:'browse ↗',q:'Give me 5 most important previous year '+exam+' questions with complete solutions. Urgency: '+m.urgency},
+{ic:'ti-notes',col:'var(--green)',bg:'var(--gd)',title:'Smart Notes',desc:'AI-generated topic summaries tuned to your deadline',link:'generate ↗',q:'Create '+(m.urgency==='extreme'?'ultra-short crash notes':'comprehensive notes')+' for the most important topic in my '+exam+' syllabus'},
+{ic:'ti-clock-bolt',col:'var(--blue)',bg:'var(--bd)',title:'Study Plan',desc:m.short+' personalised plan, topic by topic',link:'create plan ↗',q:'Create a complete '+m.short+' study plan for '+exam+'. I am in '+m.label+'. Day-by-day breakdown.'},
+{ic:'ti-math',col:'var(--rose)',bg:'rgba(255,110,180,.09)',title:'Formula Sheets',desc:'All key formulas organised by chapter',link:'generate ↗',q:'Create a complete formula sheet for '+(S.branch||'my subject')+'. '+(m.urgency==='extreme'?'Only the most critical ones for tonight.':'All exam-important formulas.')},
+{ic:'ti-trending-up',col:'var(--purple)',bg:'var(--pud)',title:'Trend Analysis',desc:'Highest-weightage topics for '+exam,link:'view ↗',q:'What are the top 10 highest-weightage topics in '+exam+' from last 10 years? Rank them by how much to prioritise given '+m.short+' left.'}];
+rg.innerHTML=items.map(function(r){return '<div class="rc" onclick="qAsk(\''+r.q.replace(/'/g,"\\'")+'\')"><div class="rc-ic" style="background:'+r.bg+';"><i class="ti '+r.ic+'" style="color:'+r.col+';font-size:18px;"></i></div><div class="rc-title">'+r.title+'</div><div class="rc-desc">'+r.desc+'</div><div class="rc-link" style="color:'+r.col+';">'+r.link+'</div></div>';}).join('');}
+
+/* ── QUIZ ── */
+function buildQuizTopics(){var g=S.goal||'college',data=SUBJECTS[g]||SUBJECTS['college'];var sel=el('q-topic');if(!sel)return;var opts=['Mixed Topics — Full Syllabus'].concat(data.chapters.map(function(c){return c.name;}));sel.innerHTML=opts.map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('');}
+async function startQuiz(){var topic=el('q-topic').value,count=parseInt(el('q-count').value)||10,diff=el('q-diff').value;var g=S.goal||'college';var exam={gate:'GATE IN 2027',jee:'JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var btn=el('quiz-start-btn'),gm=el('quiz-gen-msg');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin" style="font-size:16px;"></i> Generating…';gm.style.display='block';try{var p='Generate exactly '+count+' MCQs for '+exam+' on: "'+topic+'". Difficulty: '+diff+'.\nReturn ONLY valid JSON array, no markdown:\n[{"q":"question","opts":["A) opt","B) opt","C) opt","D) opt"],"ans":0,"exp":"explanation"}]\nans is 0-based. Exam-level questions. Include formulas in explanations.';var raw=await callAPI([{role:'user',content:p}]);var qs;try{qs=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){var m=raw.match(/\[[\s\S]*\]/);if(!m)throw new Error('Could not parse questions.');qs=JSON.parse(m[0]);}if(!Array.isArray(qs)||!qs.length)throw new Error('No questions generated.');S.quiz={questions:qs,current:0,score:0,answers:[],timer:null,timeLeft:120};el('quiz-setup').style.display='none';el('quiz-run').style.display='block';renderQ();startQT();}catch(e){toast('Error: '+e.message,'alert-circle');btn.disabled=false;btn.innerHTML='<i class="ti ti-player-play" style="font-size:16px;"></i> Generate &amp; Start Quiz';gm.style.display='none';}}
+window.startQuiz=startQuiz;
+function renderQ(){var q=S.quiz.questions[S.quiz.current],total=S.quiz.questions.length;el('qn').textContent=S.quiz.current+1;el('qt').textContent=total;el('live-score').textContent=S.quiz.score.toFixed(2);el('q-text').textContent=q.q;var pb=el('q-prog-bar');pb.innerHTML=S.quiz.questions.map(function(_,i){return '<div style="flex:1;height:3px;border-radius:2px;background:'+(i<S.quiz.current?'var(--green)':i===S.quiz.current?'var(--ac)':'var(--s4)')+'"></div>';}).join('');var qo=el('q-opts');qo.innerHTML=q.opts.map(function(o,i){return '<div class="q-opt" onclick="selAns('+i+')" tabindex="0" role="radio"><div class="q-ol">'+String.fromCharCode(65+i)+'</div><span>'+o+'</span></div>';}).join('');var qe=el('q-exp');qe.classList.remove('show');qe.innerHTML='';el('next-q-btn').disabled=true;S.quiz.timeLeft=120;updQT();}
+function startQT(){if(S.quiz.timer)clearInterval(S.quiz.timer);S.quiz.timer=setInterval(function(){S.quiz.timeLeft--;updQT();if(S.quiz.timeLeft<=0){clearInterval(S.quiz.timer);skipQ();}},1000);}
+function updQT(){var t=el('q-timer');if(!t)return;var m=Math.floor(S.quiz.timeLeft/60),s=S.quiz.timeLeft%60;t.textContent=m+':'+(s<10?'0':'')+s;t.style.color=S.quiz.timeLeft<=20?'var(--red)':'var(--amber)';}
+function selAns(idx){var q=S.quiz.questions[S.quiz.current];document.querySelectorAll('.q-opt').forEach(function(o,i){o.classList.add('locked');if(i===q.ans)o.classList.add('correct');else if(i===idx&&idx!==q.ans)o.classList.add('wrong');});var ok=idx===q.ans;S.quiz.score=Math.max(0,S.quiz.score+(ok?1:-0.33));S.quiz.answers.push({selected:idx,correct:ok});el('live-score').textContent=S.quiz.score.toFixed(2);var qe=el('q-exp');qe.innerHTML='<div style="font-size:11px;color:'+(ok?'var(--green)':'var(--red)')+';font-family:JetBrains Mono,monospace;margin-bottom:5px;">'+(ok?'✓ correct · +1 mark':'✗ wrong · −0.33 marks')+'</div><div>'+fmt(q.exp)+'</div>';qe.classList.add('show');el('next-q-btn').disabled=false;clearInterval(S.quiz.timer);}
+window.selAns=selAns;
+function skipQ(){S.quiz.answers.push({selected:-1,correct:false});clearInterval(S.quiz.timer);nextQ();}window.skipQ=skipQ;
+function nextQ(){S.quiz.current++;if(S.quiz.current>=S.quiz.questions.length){endQuiz();return;}renderQ();startQT();}window.nextQ=nextQ;
+function endQuiz(){clearInterval(S.quiz.timer);el('quiz-run').style.display='none';var total=S.quiz.questions.length,correct=S.quiz.answers.filter(function(a){return a.correct;}).length,wrong=S.quiz.answers.filter(function(a){return a.selected!==-1&&!a.correct;}).length,skipped=S.quiz.answers.filter(function(a){return a.selected===-1;}).length,pct=((S.quiz.score/total)*100).toFixed(1);S.quizStats.attempts++;S.quizStats.scores.push(parseFloat(pct));var tn=el('q-topic')?el('q-topic').value.split(' — ')[0].substring(0,26):'Quiz';S.quizStats.history.unshift({date:new Date().toLocaleDateString(),topic:tn,score:pct,correct:correct,total:total});try{sessionStorage.setItem('sai_qs',JSON.stringify(S.quizStats));}catch(e){}S.xp+=Math.round(parseFloat(pct));el('st-xp').textContent=S.xp;renderQuizHist();updQuizStat();var rv=el('quiz-result');rv.innerHTML='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:28px;text-align:center;"><div style="font-size:11px;color:var(--t3);font-family:JetBrains Mono,monospace;margin-bottom:8px;">QUIZ COMPLETE</div><div style="font-family:JetBrains Mono,monospace;font-size:54px;font-weight:700;color:var(--ac);letter-spacing:-2px;line-height:1;">'+pct+'%</div><div style="font-size:13px;color:var(--t2);margin-top:5px;">'+S.quiz.score.toFixed(2)+' / '+total+' marks</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0;"><div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px;"><div style="font-family:JetBrains Mono,monospace;font-size:18px;color:var(--green);">'+correct+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">correct</div></div><div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px;"><div style="font-family:JetBrains Mono,monospace;font-size:18px;color:var(--red);">'+wrong+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">wrong</div></div><div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:11px;"><div style="font-family:JetBrains Mono,monospace;font-size:18px;color:var(--t2);">'+skipped+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">skipped</div></div></div><div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap;"><button onclick="resetQuiz()" style="background:var(--ac);color:#000;border:none;border-radius:var(--r);padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:Clash Display,sans-serif;">New Quiz</button><button onclick="qAsk(\'I scored '+pct+'% on my quiz. Help me understand what I missed and give me targeted practice.\')" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 20px;font-size:13px;cursor:pointer;color:var(--ac);">AI Analysis ↗</button></div></div>';rv.style.display='block';}
+function resetQuiz(){el('quiz-setup').style.display='block';el('quiz-result').style.display='none';el('quiz-run').style.display='none';var b=el('quiz-start-btn');b.disabled=false;b.innerHTML='<i class="ti ti-player-play" style="font-size:16px;"></i> Generate &amp; Start Quiz';el('quiz-gen-msg').style.display='none';}
+window.resetQuiz=resetQuiz;
+function renderQuizHist(){var e=el('quiz-hist');if(!e)return;if(!S.quizStats.history.length){e.innerHTML='<div style="font-size:13px;color:var(--t3);">No quizzes yet.</div>';return;}e.innerHTML=S.quizStats.history.slice(0,5).map(function(h){var c=parseFloat(h.score)>=70?'var(--green)':parseFloat(h.score)>=50?'var(--amber)':'var(--red)';return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1);"><div style="flex:1;"><div style="font-size:12px;">'+h.topic+'</div><div style="font-size:11px;color:var(--t3);">'+h.date+' · '+h.correct+'/'+h.total+'</div></div><div style="font-family:JetBrains Mono,monospace;font-size:13px;color:'+c+';">'+h.score+'%</div></div>';}).join('');}
+function updQuizStat(){if(!S.quizStats.scores.length)return;var avg=S.quizStats.scores.reduce(function(a,b){return a+b;},0)/S.quizStats.scores.length;el('st-quiz').textContent=avg.toFixed(0)+'%';el('st-quiz-d').textContent=S.quizStats.attempts+' quizzes taken';}
+
+/* ── CHEAT SHEETS ── */
+function buildCSFilters(){var g=S.goal||'college';var topics={college:['Data Structures','Operating Systems','Computer Networks','Engineering Mathematics'],gate:['Control Systems','Instrumentation','Signals & Systems','Analog Electronics'],jee:['Mechanics','Electrostatics','Organic Chemistry','Calculus'],neet:['Cell Biology','Human Physiology','Chemical Bonding','Laws of Motion'],boards:['Electric Fields','Current Electricity','Organic Chemistry','Calculus'],upsc:['Indian Polity','Indian Economy','Modern History','Geography']}[g]||['Core Topics'];var fb=el('cs-filter-bar');if(!fb)return;fb.innerHTML=topics.map(function(t,i){return '<div class="syl-fc'+(i===0?' active':'')+'" onclick="loadCS(this,\''+t.replace(/'/g,"\\'")+'\')">'+t.toLowerCase()+'</div>';}).join('');loadCS(fb.querySelector('.syl-fc.active'),topics[0]);}
+async function loadCS(el_,topic){document.querySelectorAll('#cs-filter-bar .syl-fc').forEach(function(f){f.classList.remove('active');});if(el_)el_.classList.add('active');S.csCurrentTopic=topic;var cc=el('cs-content');if(!cc)return;cc.innerHTML='<div style="text-align:center;padding:44px;color:var(--t3);"><i class="ti ti-loader-2 spin" style="font-size:28px;display:block;margin-bottom:12px;"></i>Generating…</div>';try{var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={gate:'GATE IN 2027',jee:'JEE/JEE Advanced',neet:'NEET',upsc:'UPSC',boards:'Board Exam',college:'exam'}[g]||'exam';var p='Create a '+(m.urgency==='extreme'?'ultra-concise crash':'concise')+' cheat sheet for '+exam+' on: "'+topic+'".\n\nFormat:\n## '+topic+' — '+(m.urgency==='extreme'?'Tonight\'s':'Quick')+' Reference\n### Key Formulas\n'+(m.urgency==='extreme'?'Top 5 only':'5-8 most important')+'\n### Key Concepts\n3-4 bullet points\n### Exam Tips\n2-3 specific tips\n\nBe concise. Adapted for '+m.label+'.';var reply=await callAPI([{role:'user',content:p}]);cc.innerHTML='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--rm);padding:20px;margin-bottom:12px;font-size:13px;line-height:1.8;">'+fmt(reply)+'</div><div style="display:flex;gap:8px;"><button onclick="loadCS(document.querySelector(\'#cs-filter-bar .syl-fc.active\'),\''+topic.replace(/'/g,"\\'")+'\');" class="btn-send" style="font-size:12px;padding:8px 14px;"><i class="ti ti-refresh" style="font-size:12px;"></i> Regenerate</button><button onclick="exportCS()" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;color:var(--t2);display:inline-flex;align-items:center;gap:5px;"><i class="ti ti-download" style="font-size:12px;"></i> Export</button></div>';}catch(e){cc.innerHTML='<div style="text-align:center;padding:32px;color:var(--red);">Error: '+e.message+'</div>';}}
+window.loadCS=loadCS;
+async function customCS(){var topic=prompt('Enter topic for custom cheat sheet:');if(!topic||!topic.trim())return;await loadCS(null,topic.trim());}
+window.customCS=customCS;
+function exportCS(){var content=document.querySelector('#cs-content')?document.querySelector('#cs-content').innerText:'No content';var blob=new Blob(['Ameyay Cheat Sheet\n'+S.csCurrentTopic+'\nMode: '+(S.timeLabel||'Standard')+'\nFor: '+(S.name||'Student')+'\n\n'+content],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cheatsheet_'+S.csCurrentTopic.replace(/\s+/g,'_').toLowerCase()+'.txt';a.click();toast('Exported!','download');}
+window.exportCS=exportCS;
+
+/* ── PROGRESS ── */
+function buildProgBars(){var g=S.goal||'college';var items={college:[['Data Structures',88,'var(--ac)'],['Engg. Maths',76,'var(--green)'],['Operating Systems',52,'var(--amber)'],['Digital Logic',91,'var(--blue)'],['Networks',0,'var(--t3)']],gate:[['Control Systems',68,'var(--ac)'],['Instrumentation',52,'var(--green)'],['Signals & Systems',74,'var(--amber)'],['Analog Electronics',45,'var(--rose)'],['Engg. Maths',80,'var(--blue)']],jee:[['Physics',65,'var(--ac)'],['Chemistry',48,'var(--green)'],['Mathematics',72,'var(--amber)']],neet:[['Biology',58,'var(--ac)'],['Physics',62,'var(--green)'],['Chemistry',44,'var(--amber)']],boards:[['Physics',70,'var(--ac)'],['Chemistry',55,'var(--green)'],['Maths',65,'var(--amber)']],upsc:[['GS 1',45,'var(--ac)'],['GS 2',38,'var(--green)'],['GS 3',20,'var(--amber)'],['GS 4',15,'var(--blue)']]}[g]||[];var pb=el('prog-bars');if(!pb)return;pb.innerHTML=items.map(function(d){return '<div class="pb-row"><div class="pb-lbl">'+d[0]+'</div><div class="pb-bar"><div class="pb-fill" style="width:'+d[1]+'%;background:'+d[2]+';"></div></div><div class="pb-pct" style="color:'+d[2]+';">'+d[1]+'%</div></div>';}).join('');el('prog-sub').textContent=(S.college?S.college.name+' · ':'')+( S.branch||'All Subjects')+' · '+(S.year||'');var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var it=el('insight-txt');if(it)it.innerHTML='You\'re in <strong style="color:'+m.color+';">'+m.label+'</strong>, '+S.name+'! '+{night:'Focus on the top 20% of topics tonight. Start with what you know.',week:'7 days, laser focus. Start with your weakest high-yield topics.',month:'You have time to cover everything. Stick to the daily plan.',three_months:'Build real understanding. Revise each topic at least twice.',six_months:'Go deep. Master concepts, not just formulas.',year:'Be patient and thorough. The foundation you build now will carry you.'}[S.timeMode||'month']+' <span style="color:var(--ac);cursor:pointer;" onclick="swP(document.getElementById(\'nav-tutor\'),\'tutor\')">Go to AI Tutor →</span>';}
+
+/* ── INIT ── */
+renderCols('');
+var csi=el('col-search');if(csi){csi.addEventListener('input',function(){renderCols(csi.value);});csi.addEventListener('focus',function(){if(!csi.value)renderCols('');});}
+
+})();
+</script>
+</body>
+</html>
