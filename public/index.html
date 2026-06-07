@@ -1017,7 +1017,7 @@ function setMode(el_,m){document.querySelectorAll('.mp').forEach(function(p){p.c
 window.setMode=setMode;
 
 /* ── API ── */
-var API='/api/tutor/chat',GEN='/api/tutor/generate',QUIZ='/api/quiz/generate';
+var API='https://ameyay.onrender.com/api/tutor/chat',GEN='https://ameyay.onrender.com/api/tutor/generate',QUIZ='https://ameyay.onrender.com/api/quiz/generate';
 function sysPmt(){var g=S.goal||'college';var m=TIME_MODES[S.timeMode]||TIME_MODES['month'];var exam={college:(S.college?S.college.name:'')+' '+(S.branch||''),gate:'GATE 2027 Paper '+(S.branch||'IN'),jee:'JEE / JEE Advanced',neet:'NEET',boards:'Class 11/12',upsc:'UPSC Civil Services'}[g]||'exam';return 'You are Ameyay, a personal AI tutor for '+(S.name||'a student')+' preparing for '+exam+'.\n\nTime Mode: '+m.label+' ('+m.short+' to exam) — urgency: '+m.urgency+'\nExplanation mode: '+S.tutorMode+'\n\nBased on urgency "'+m.urgency+'", adjust response style: '+{extreme:'Ultra-concise. Only what\'s needed for tonight. No fluff.',high:'Fast-paced. Focus on high-yield content only.',medium:'Balanced. Cover topics properly but stay focused.',moderate:'Thorough but engaging. Build real understanding.',low:'Deep and strategic. Master concepts, not just surface.',relaxed:'Comprehensive. Build from fundamentals to advanced.'}[m.urgency]+'\n\nUse **bold** for key terms, `code` for formulas. Be encouraging and exam-focused.';}
 async function callAPI(messages){var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:MDL,max_tokens:1200,system:sysPmt(),messages:messages})});if(!r.ok){var e={};try{e=await r.json();}catch(_){}throw new Error((e.error&&e.error.message)||'API error '+r.status);}var d=await r.json();return d.content[0].text;}
 

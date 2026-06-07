@@ -1,0 +1,4 @@
+{"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}
+{"$$indexCreated":{"fieldName":"enrollmentId","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"email","unique":true}}
+{"$$indexCreated":{"fieldName":"enrollmentId"}}
